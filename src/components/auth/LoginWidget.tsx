@@ -8,16 +8,15 @@ const LoginWidget: React.FC = (): React.ReactElement | null => {
     const { oktaAuth, authState } = useOktaAuth();
     const navigate = useNavigate();
 
+    const onSuccess = async (accessTokens: any) => {
+        console.log(accessTokens)
+        await oktaAuth.handleLoginRedirect(accessTokens);
+    };
+
+
+
     React.useEffect(() => {
         if (!authState?.isAuthenticated) {
-            const onSuccess = async (res: any) => {
-                if (res.status === 'SUCCESS') {
-                    await oktaAuth.handleLoginRedirect(res.tokens);
-                } else {
-                    console.log(Error)
-                }
-            };
-
             const onError = (err: Error) => {
                 console.error('sign in error', err);
             };
