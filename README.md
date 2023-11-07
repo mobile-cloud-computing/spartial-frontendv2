@@ -44,7 +44,7 @@ yarn install
 
 ## Configuration
 
-Before running the application, you need to set up the following environment variables with your Okta configuration details. Create a `.env` file in the root directory
+Before running Spatial, you need to set up the following environment variables with your Okta configuration details. Create a `.env` file in the root directory
 Replace yourOktaClientId, yourOktaIssuerUrl, etc., with actual Okta configuration details. Request them if you don't have this information.
 
 ```env
@@ -70,13 +70,13 @@ or with Yarn:
 yarn start
 ```
 
-The application will open in your default web browser at `http://localhost:3000`.
+Spatial will open in your default web browser at `http://localhost:3000`.
 
 ## Docker Support
 
 ### Building the Docker Image
 
-To build a Docker image of your application, run:
+To build a Docker image of Spatial, run:
 
 ```bash
 docker build -t spatial .
@@ -84,16 +84,16 @@ docker build -t spatial .
 
 ### Running the Docker Container
 
-To run your application as a Docker container:
+To run Spatial as a Docker container:
 
 ```bash
 docker run -p 3000:3000 spatial 
 ```
 
-Your app will now be accessible at `http://localhost:3000`.
+Spatial will now be accessible at `http://localhost:3000`.
 
 
-This will generate a `build` folder with your compiled application.
+This will generate a `build` folder with Spatial compiled application.
 
 ## Contributing
 
