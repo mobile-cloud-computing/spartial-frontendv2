@@ -16,7 +16,18 @@ Clone the repository to your local machine:
 
 ```bash
 git clone https://github.com/toluelemson/spartial-frontendv2.git
+```
+
+Change directory to the cloned repository:
+
+```bash
 cd spartial-frontendv2
+```
+
+Checkout the feature branch:
+
+```bash
+git checkout authentication
 ```
 
 Install the necessary dependencies:
@@ -33,11 +44,16 @@ yarn install
 
 ## Configuration
 
-Create a `.env` file in the root directory of your project and add Okta configuration details:
+Before running the application, you need to set up the following environment variables with your Okta configuration details. Create a `.env` file in the root directory
+Replace yourOktaClientId, yourOktaIssuerUrl, etc., with actual Okta configuration details. Request them if you don't have this information.
 
 ```env
-REACT_APP_OKTA_CLIENT_ID=yourOktaClientId
-REACT_APP_OKTA_ISSUER=yourOktaIssuerUrl
+REACT_APP_OKTA_CLIENT_ID=OktaClientId
+REACT_APP_OKTA_ISSUER=OktaIssuerUrl
+REACT_APP_OKTA_REDIRECT_URI=OktaRedirectUri
+REACT_APP_OKTA_SCOPES=OktaScopes
+REACT_APP_OKTA_PKCE=OktaPkce
+REACT_APP_OKTA_DISABLE_HTTPS_CHECK=OktaDisableHttpsCheck
 ```
 
 ## Running the Application Locally
@@ -45,7 +61,7 @@ REACT_APP_OKTA_ISSUER=yourOktaIssuerUrl
 Start the development server:
 
 ```bash
-npm run start
+npm start
 ```
 
 or with Yarn:
@@ -76,20 +92,6 @@ docker run -p 3000:3000 spatial
 
 Your app will now be accessible at `http://localhost:3000`.
 
-
-## Building for Production
-
-To create a production build of the application:
-
-```bash
-npm run build
-```
-
-or with Yarn:
-
-```bash
-yarn build
-```
 
 This will generate a `build` folder with your compiled application.
 
