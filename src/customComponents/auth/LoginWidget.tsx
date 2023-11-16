@@ -33,7 +33,7 @@ const LoginWidget: React.FC = (): React.ReactElement | null => {
 
     React.useEffect(() => {
         if (authState?.isAuthenticated) {
-            navigate('/protected');
+            navigate('/dashboard');
         }
     }, [authState?.isAuthenticated, navigate]);
 
@@ -42,9 +42,25 @@ const LoginWidget: React.FC = (): React.ReactElement | null => {
     }
 
     return (
-        <div>
-            <div id="sign-in-widget" />
-        </div>
+        <>
+            <main className="main-content mt-3">
+                <section>
+                    <div className="page-header min-vh-100">
+                        <div className="container">
+                            <div className="row">
+                                <div className="col-10 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 end-0 text-center justify-content-center flex-column">
+                                    <div className="position-relative bg-gradient-primary  h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden" style={{ backgroundImage: "url('#')", backgroundSize: "cover" }}>
+                                        <span className="mask bg-gradient-primary opacity-6"></span>
+                                        <div id="sign-in-widget" className= "justify-content-center"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+        </>
     );
 };
 
