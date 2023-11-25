@@ -1,29 +1,17 @@
-import { requestAllReports, requestBuildStatusAC, requestMMTStatus } from "../api";
+import {requestAllReports, requestBuildStatusAC, requestDatasetAC, requestMMTStatus} from "../api";
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-
-export interface OptionInterface {
-    reports: string;
-}
-
-const initialBuildStatus: BuildStatusInterface | null = null;
-
-export interface MMTStatusInterface {
-    isRunning: boolean;
-}
-
-export interface BuildStatusInterface {
-    isRunning: boolean | null;
-    lastBuildAt: string | null;
-    buildStatus: any
-}
+import {AcDataSetInterface, BuildStatusType, MMTStatusInterface, OptionInterface} from "../types/types";
+import {useOktaAuth} from "@okta/okta-react";
 
 interface SpatialContextType {
-    reportState: OptionInterface[];
-    setReportState: React.Dispatch<React.SetStateAction<OptionInterface[]>>;
+    reportState: OptionInterface[] | null;
+    setReportState: React.Dispatch<React.SetStateAction<OptionInterface[] |null>>;
     MMTStatusState: MMTStatusInterface | null;
     setMMTStatusState: React.Dispatch<React.SetStateAction<MMTStatusInterface | null>>;
-    buildStatusState: BuildStatusInterface | null;
-    setBuildStatusState: React.Dispatch<React.SetStateAction<BuildStatusInterface | null>>;
+    buildStatusState: BuildStatusType  | null;
+    acDataset: AcDataSetInterface | null;
+    setAcDataset: React.Dispatch<React.SetStateAction<AcDataSetInterface | null>>;
+    setBuildStatusState: React.Dispatch<React.SetStateAction<BuildStatusType | null>>;
 }
 const SpatialContext = createContext<SpatialContextType | undefined>(undefined);
 
@@ -31,37 +19,68 @@ interface ProviderProps {
     children: ReactNode;
 }
 
-export const Provider: React.FC<ProviderProps> = ({ children }) => {
-    const [reportState, setReportState] = useState<OptionInterface[]>([]);
-    const [MMTStatusState, setMMTStatusState] = useState<MMTStatusInterface | null>(null);
-    const [buildStatusState, setBuildStatusState] = useState<BuildStatusInterface | null>(initialBuildStatus);
+const initialBuildStatus: BuildStatusType | null = null;
 
+const initialAcDataset: AcDataSetInterface | null = null
+
+export const Provider: React.FC<ProviderProps> = ({ children }) => {
+    const [reportState, setReportState] = useState<OptionInterface[] | null>([] || null);
+    const [MMTStatusState, setMMTStatusState] = useState<MMTStatusInterface | null>(null);
+    const [buildStatusState, setBuildStatusState] = useState<BuildStatusType | null>(initialBuildStatus);
+    const [acDataset, setAcDataset] = useState<AcDataSetInterface | null>(initialAcDataset);
+
+    const { authState } = useOktaAuth();
 
     useEffect(() => {
         const loadData = async () => {
+            if (!authState?.isAuthenticated) return;
 
             try {
-                const dataSetOptionsResponse = await requestAllReports() ;
-                const MMTStatusResponse = await requestMMTStatus() as MMTStatusInterface;
+                const [
+                    dataSetOptionsResponse,
+                    AcdataSetOptionsResponse,
+                    MMTStatusResponse,
+                    buildStatusResponse
+                ] = await Promise.all([
+                    requestAllReports(),
+                    requestDatasetAC(),
+                    requestMMTStatus(),
+                    requestBuildStatusAC(),
+                ]);
 
                 setReportState(dataSetOptionsResponse);
-                const buildStatusResponse = await requestBuildStatusAC() as BuildStatusInterface;
+                setAcDataset(AcdataSetOptionsResponse);
+                setBuildStatusState(buildStatusResponse || null);
 
-                setMMTStatusState(MMTStatusResponse);
-                if (buildStatusResponse ) {
-                    setBuildStatusState(buildStatusResponse);
+                if (Array.isArray(MMTStatusResponse) && MMTStatusResponse.length === 0) {
+                    setMMTStatusState(null);
                 } else {
-                    setBuildStatusState(null);
+                    setMMTStatusState(MMTStatusResponse as MMTStatusInterface);
                 }
+
             } catch (error) {
-                setBuildStatusState(null);
+                console.error('Error fetching data:', error);
             }
         };
-        loadData();
-    }, []);
+
+        loadData().catch(error => {
+            console.error('Error in loadData:', error);
+        })
+    }, [authState?.isAuthenticated]);
+
+    const contextValue = {
+        reportState,
+        setReportState,
+        MMTStatusState,
+        setMMTStatusState,
+        buildStatusState,
+        setBuildStatusState,
+        acDataset,
+        setAcDataset
+    };
 
     return (
-        <SpatialContext.Provider value={{ reportState, setReportState, MMTStatusState, setMMTStatusState, buildStatusState, setBuildStatusState }}>
+        <SpatialContext.Provider value={contextValue}>
             {children}
         </SpatialContext.Provider>
     );
