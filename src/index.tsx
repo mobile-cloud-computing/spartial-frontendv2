@@ -16,13 +16,14 @@ const AuthWrapper = () => {
     };
 
     const restoreOriginalUri = async (_oktaAuth: any, originalUri: any) => {
-
         navigate(toRelativeUrl(originalUri || '/', window.location.origin));
     };
 
     return (
         <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri} onAuthRequired={customAuthHandler}>
-            <App />
+            <Provider>
+                <App />
+            </Provider>
         </Security>
     );
 };
@@ -34,9 +35,7 @@ const root = ReactDOM.createRoot(
 root.render(
     <React.StrictMode>
         <BrowserRouter>
-            <Provider>
-                <AuthWrapper />
-            </Provider>
+            <AuthWrapper />
         </BrowserRouter>
     </React.StrictMode>
 );
