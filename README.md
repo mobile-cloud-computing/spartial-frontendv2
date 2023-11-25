@@ -84,7 +84,7 @@ docker build -t spatial .
 
 ### Running the Docker Container
 
-To run Spatial as a Docker container:
+To run Spatial Frontend as a Docker container:
 
 ```bash
 docker run -p 3000:3000 spatial 
@@ -92,8 +92,12 @@ docker run -p 3000:3000 spatial
 
 Spatial will now be accessible at `http://localhost:3000`.
 
+### Running the Spatial Backend
+To run the Spatial Backend as a Docker container, make sure you have cloned the Maip backend from this repository: [https://github.com/Montimage/maip](https://github.com/Montimage/maip)
 
-This will generate a `build` folder with Spatial compiled application.
+```bash
+sudo docker run -p 31057:31057 maip-server
+```
 
 ## Contributing
 
