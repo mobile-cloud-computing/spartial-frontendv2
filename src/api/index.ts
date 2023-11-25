@@ -61,5 +61,7 @@ export const requestBuildACModel = async (modelType: any, dataset: any, features
     return makeApiRequest<any>(`${SERVER_URL}/api/ac/build`, 'post', { buildACConfig });
 };
 
-
-
+export const requestAllModels = async () => {
+    const response = await makeApiRequest<any>(`${SERVER_URL}/api/models`);
+    return response ? response.models : null;
+}

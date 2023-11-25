@@ -8,10 +8,12 @@ import ModelPage from "../pages/home/ModelPage";
 import Dashboard from "../pages/home/Dashboard";
 import BuildACModelForm from "../customComponents/models/BuilldACModelForms";
 import NoMatchComponent from "../customComponents/NoMatchComponent";
+import AllModels from "../customComponents/models/ModelList";
 
 const routeConfig = [
     { path: '/', element: <Dashboard /> },
     { path: '/build/ad', element: <ModelPage /> },
+    { path: '/models/all', element: <AllModels /> },
     { path: '/build/ac', element: <BuildACModelForm /> },
     { path: '/login', element: <LoginWidget />, isProtected: false },
     { path: '/login/callback', element: <LoginCallback />, isProtected: false },

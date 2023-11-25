@@ -1,7 +1,5 @@
 export type DatasetType = { datasetId: string | null; isAttack: boolean }[]
 
-
-
 export interface TParamType {
     [key: string]: string;
 }
@@ -37,3 +35,12 @@ export type MMTStatusInterface  = {
 export type AcDataSetInterface = {
     datasets: string[]
 }
+
+
+export type ModelData = {
+    modelId: string;
+    lastBuildAt: number;
+    buildConfig: object;
+};
+
+export type ModelListType = ModelData[];
