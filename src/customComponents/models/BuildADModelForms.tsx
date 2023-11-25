@@ -9,7 +9,9 @@ import {
     Card,
 } from 'react-bootstrap';
 import { useSpatialContext } from '../../context/context';
-import { requestBuildModel} from "../../api";
+import { requestBuildADModel } from "../../api";
+import { BuildStatusType, TParamType } from "../../types/types";
+import useCheckBuildStatus from "../utility/useCheckBuildStatus";
 
 interface FormState {
     maliciousDataset: string | null;
@@ -22,13 +24,10 @@ interface FormState {
     batchSizeSAE: number;
 }
 
-interface TParamType {
-    [key: string]: string;
-}
 
-const BuildModelForm: React.FC = () => {
-    const { reportState, buildStatusState} = useSpatialContext();
-
+const BuildADModelForm: React.FC = () => {
+    const { reportState } = useSpatialContext();
+    const [{buildStatusStatex, updateBuildStatus}] = useCheckBuildStatus();
 
     const initialFormData: FormState = useMemo(() => ({
         maliciousDataset: null,
@@ -45,8 +44,6 @@ const BuildModelForm: React.FC = () => {
     const [formData, setFormData] = useState<FormState>(initialFormData);
     const [options, setOptions] = useState<any>(reportState || null);
     const [isFormValid, setIsFormValid] = useState(false);
-    const [isRunning, setIsRunning] = useState<boolean | null>(buildStatusState?.isRunning ?? null);
-
 
 
     const trainingParameters = useMemo(() => [
@@ -80,10 +77,10 @@ const BuildModelForm: React.FC = () => {
         const isAnyFieldEmpty = Object.values(formData).some((value) => value === null);
         setIsFormValid(!isAnyFieldEmpty);
         setOptions(reportState);
-    }, [reportState, formData, isRunning])
+    }, [reportState, formData])
 
 
-    const handleSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleBuildADModelSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!isFormValid) {
             alert('Please fill out all required fields.');
@@ -100,20 +97,9 @@ const BuildModelForm: React.FC = () => {
             {datasetId: formData.normalDataset, isAttack: false},
         ];
         try {
-            const response = await requestBuildModel(datasets, formData.trainingRatio, TParam);
-
-            if (response) {
-                console.log(response.isRunning);
-
-                if (buildStatusState) {
-                    setIsRunning(buildStatusState.isRunning);
-                }
-
-                if (!isRunning) {
-                    const builtModelId = buildStatusState?.lastBuildAt ?? "";
-                    console.log(builtModelId);
-                    alert(`The model ${builtModelId} was built successfully!`);
-                }
+            const response : BuildStatusType | null = await requestBuildADModel(datasets, formData.trainingRatio, TParam);
+            if (response && !buildStatusStatex?.isRunning) {
+                updateBuildStatus()
             } else {
                 console.log('Response is null or undefined');
             }
@@ -121,11 +107,10 @@ const BuildModelForm: React.FC = () => {
             alert("Failed to build the model. Please try again.");
             console.error(error);
         }
-        console.log(isRunning)
-    }, [isFormValid, formData, trainingParameters, isRunning]);
+    }, [isFormValid, formData, trainingParameters]);
 
     const handleInputChange = (
-        event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+        event:  React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
         const { name, value } = event.target;
         setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
@@ -149,7 +134,7 @@ const BuildModelForm: React.FC = () => {
     return (
         <Container>
             <Row className="contentContainer">
-                <Form onSubmit={handleSubmit}>
+                <Form onSubmit={handleBuildADModelSubmit}>
                     <h2>Build Models</h2>
                     <p>Build a new AI model for anomaly detection</p>
                     {inputGroups.map((group, index) => (
@@ -197,7 +182,7 @@ const BuildModelForm: React.FC = () => {
                             max="1"
                             name="trainingRatio"
                             value={formData.trainingRatio.toString()}
-                            onChange={(event:any)=> handleInputChange(event)}
+                            onChange={(event)=> handleInputChange(event)}
                         />
                     </InputGroup>
                     <Accordion defaultActiveKey="0">
@@ -211,7 +196,7 @@ const BuildModelForm: React.FC = () => {
                                                 type="number"
                                                 name={param.name}
                                                 value={param.value}
-                                                onChange={(event: any) => handleInputChange(event)}
+                                                onChange={(event) => handleInputChange(event)}
                                             />
                                         </Form.Group>
                                     ))}
@@ -228,4 +213,4 @@ const BuildModelForm: React.FC = () => {
     );
 };
 
-export default BuildModelForm;
+export default BuildADModelForm;
