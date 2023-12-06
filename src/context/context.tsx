@@ -1,4 +1,10 @@
-import {requestAllModels, requestAllReports, requestBuildStatusAC, requestDatasetAC, requestMMTStatus} from "../api";
+import {
+    requestAllModels,
+    requestAllReports,
+    requestBuildStatusAC,
+    requestDatasetAC,
+    requestMMTStatus,
+} from "../api";
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import {AcDataSetInterface, BuildStatusType, MMTStatusInterface, ModelListType, OptionInterface} from "../types/types";
 import {useOktaAuth} from "@okta/okta-react";
@@ -33,6 +39,7 @@ export const Provider: React.FC<ProviderProps> = ({ children }) => {
     const [buildStatusState, setBuildStatusState] = useState<BuildStatusType | null>(initialBuildStatus);
     const [acDataset, setAcDataset] = useState<AcDataSetInterface | null>(initialAcDataset);
     const [allModel, setAllModel] = useState<ModelListType | null>(initialModelList);
+    const [viewDatasets, setViewDatasets] = useState()
 
     const { authState } = useOktaAuth();
 
@@ -86,7 +93,9 @@ export const Provider: React.FC<ProviderProps> = ({ children }) => {
         acDataset,
         setAcDataset,
         allModel,
-        setAllModel
+        setAllModel,
+        viewDatasets,
+        setViewDatasets
     };
 
     return (
