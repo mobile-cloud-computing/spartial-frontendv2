@@ -92,12 +92,24 @@ docker run -p 3000:3000 spatial
 
 Spatial will now be accessible at `http://localhost:3000`.
 
+
+
 ### Running the Spatial Backend
 To run the Spatial Backend as a Docker container, make sure you have cloned the Maip backend from this repository: [https://github.com/Montimage/maip](https://github.com/Montimage/maip)
+```bash 
+git clone https://github.com/Montimage/maip
+```
+```bash 
+cd maip
+```
 
+```bash
+sudo docker build -f Dockerfile.server -t maip-server .
+```
 ```bash
 sudo docker run -p 31057:31057 maip-server
 ```
+
 
 ## Contributing
 
