@@ -11,7 +11,7 @@ import {
 import { useSpatialContext } from '../../context/context';
 import { requestBuildADModel } from "../../api";
 import { BuildStatusType, TParamType } from "../../types/types";
-import useCheckBuildStatus from "../utility/useCheckBuildStatus";
+import useCheckBuildStatus from "../util/useCheckBuildStatus";
 
 interface FormState {
     maliciousDataset: string | null;

@@ -3,7 +3,7 @@ import { Button, Container, Form, InputGroup, Row } from "react-bootstrap";
 import {FEATURE_OPTIONS, AI_MODEL_TYPES} from "../../constants";
 import {useSpatialContext} from "../../context/context";
 import { requestBuildACModel } from "../../api";
-import useCheckBuildStatus from "../utility/useCheckBuildStatus";
+import useCheckBuildStatus from "../util/useCheckBuildStatus";
 
 interface FormState {
     modelType: string;
@@ -25,13 +25,13 @@ const BuildACModelForm: React.FC = () => {
     }), []);
     const [formData, setFormData] = useState<FormState>(initialFormData);
     const [isFormValid, setIsFormValid] = useState(false);
-    const [acDataState, setAcDatasetState] = useState<any | null>( null);
+    const [acDataState, setAcDatasetState] = useState<string | null>( null);
     const [isLoading, setIsLoading] = useState(true)
 
 
     useEffect(() => {
         if (acDataset && acDataset.datasets) {
-            setAcDatasetState(acDataset.datasets);
+            // setAcDatasetState(acDataset.datasets);
             setIsLoading(false);
         }
     }, [acDataset, isLoading]);
@@ -91,10 +91,10 @@ const BuildACModelForm: React.FC = () => {
             return;
         }
 
-        const { modelType, featureList, trainingRatio } = formData;
+        const { modelType, featureList, dataSet, trainingRatio } = formData;
 
         try {
-            const response = await requestBuildACModel(modelType, acDataState, featureList, trainingRatio);
+            const response = await requestBuildACModel(modelType, dataSet, featureList, trainingRatio);
 
             if (response && !buildStatusStatex?.isRunning) {
                 updateBuildStatus()
