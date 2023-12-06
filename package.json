@@ -21,11 +21,12 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "lucide-react": "^0.292.0",
+    "papaparse": "^5.4.1",
     "react": "^18.2.0",
-    "react-axios": "^2.0.6",
     "react-bootstrap": "^2.9.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.12.0",
     "react-scripts": "5.0.1",
     "sass": "^1.69.5",
     "tailwind-merge": "^2.0.0",
@@ -34,7 +35,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "PORT=3006 react-scripts start",
+    "start": "PORT=3000 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -59,6 +60,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@types/papaparse": "^5.3.14",
     "resolve-url-loader": "^5.0.0",
     "tailwindcss": "^3.3.5"
   }
