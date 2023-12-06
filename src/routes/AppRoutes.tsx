@@ -9,30 +9,42 @@ import Dashboard from "../pages/home/Dashboard";
 import BuildACModelForm from "../customComponents/models/BuilldACModelForms";
 import NoMatchComponent from "../customComponents/NoMatchComponent";
 import AllModels from "../customComponents/models/ModelList";
+import DatasetList from "../customComponents/datasets/DatasetList";
 
-const routeConfig = [
-    { path: '/', element: <Dashboard /> },
-    { path: '/build/ad', element: <ModelPage /> },
-    { path: '/models/all', element: <AllModels /> },
-    { path: '/build/ac', element: <BuildACModelForm /> },
-    { path: '/login', element: <LoginWidget />, isProtected: false },
-    { path: '/login/callback', element: <LoginCallback />, isProtected: false },
-    { path: '/protected', element: <ProtectedComponent /> },
-    { path: '*', element: <NoMatchComponent />, isProtected: false } // No match route
+interface RouteConfig {
+    path: string;
+    Component: React.ComponentType;
+    isProtected?: boolean;
+}
+
+const routeConfig : RouteConfig[] = [
+    { path: '/', Component: Dashboard },
+    { path: '/build/ad', Component: ModelPage },
+    { path: '/models/all', Component: AllModels },
+    { path: '/build/ac', Component: BuildACModelForm },
+    { path: '/login', Component: LoginWidget, isProtected: false },
+    { path: '/login/callback', Component: LoginCallback, isProtected: false },
+    { path: '/protected', Component: ProtectedComponent },
+    { path: '/datasets/:type/:action', Component: DatasetList },
+    { path: '*', Component: NoMatchComponent, isProtected: false }
 ];
 
-const AppRoutes = () => {
-    return (
-        <Routes>
-            {routeConfig.map(({ path, element, isProtected = true }) => (
-                <Route
-                    key={path}
-                    path={path}
-                    element={isProtected ? <ProtectedRoute>{element}</ProtectedRoute> : element}
-                />
-            ))}
-        </Routes>
-    );
-};
+const AppRoutes: React.FC = () => (
+    <Routes>
+        {routeConfig.map(({ path, Component, isProtected = true }) => (
+            <Route
+                key={path}
+                path={path}
+                element={
+                    isProtected ?
+                        <ProtectedRoute>
+                            <Component />
+                        </ProtectedRoute>
+                        : <Component />
+                }
+            />
+        ))}
+    </Routes>
+);
 
 export default AppRoutes;
