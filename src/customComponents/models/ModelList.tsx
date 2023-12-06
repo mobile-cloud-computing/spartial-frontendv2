@@ -1,25 +1,109 @@
-import React, { useState, useCallback } from 'react';
-import { Button, Table, DropdownButton, Dropdown, Card, Pagination } from 'react-bootstrap';
+import React, {useState, useCallback, useMemo, FC, useRef} from 'react';
+import {
+    Button,
+    Table,
+    DropdownButton,
+    Dropdown,
+    Pagination,
+    Container,
+    Modal
+} from 'react-bootstrap';
+import {BsDownload, BsEye, BsPencil, BsCamera, BsSave, BsSave2} from "react-icons/bs";
+import { CopyIcon } from "@radix-ui/react-icons";
 import { useSpatialContext } from "../../context/context";
-import { Utility } from "../utility/utility";
 import { ModelData, ModelListType } from "../../types/types";
+import {ConvertTimeStamp} from "../util/utility";
+import ActionButton from "../util/ActionButton";
+import {requestDownloadDatasets, requestDownloadModel, requestUpdateModel} from "../../api";
+import {To, useNavigate} from "react-router-dom";
 
-const ModelsTable: React.FC = () => {
-    const { allModel } = useSpatialContext();
-    const models: ModelListType | null = allModel as ModelListType | null;
+const AllModels: FC = () => {
 
+    const navigate = useNavigate();
+
+    const {allModel} = useSpatialContext();
+    const models = useMemo(() => allModel as ModelListType | null, [allModel]);
+    const [showModal, setShowModal] = useState(false);
     const [selectedModel, setSelectedModel] = useState<ModelData | null>(null);
+    const [isEditable, setIsEditable] = useState(false);
+    const [editableModelId, setEditableModelId] = useState<string | null>(null);
 
-    const handleRowClick = useCallback((model: ModelData) => {
+    const [newModelId, setNewModelId] = useState<string>("");
+
+    const editableDivRefs = useRef<{ [key: string]: HTMLDivElement }>({});
+
+    const toggleEdit = (modelId: string) => {
+        const isCurrentModelEditable = editableModelId === modelId;
+        setEditableModelId(isCurrentModelEditable ? null : modelId);
+
+
+        setTimeout(() => {
+            if (!isCurrentModelEditable && editableDivRefs.current[modelId]) {
+                editableDivRefs.current[modelId].focus();
+            }
+        }, 0);
+
+        // setSelectedModel((prev) => {
+        //     if (prev === null) {
+        //         return {
+        //             modelId: model.modelId,
+        //             lastBuildAt: model.lastBuildAt,
+        //             buildConfig: model.buildConfig
+        //         };
+        //     } else {
+        //         return {
+        //             ...prev,
+        //             modelId: newModelId
+        //         };
+        //     }
+        // });
+        //
+        // if(isEditable){
+        //     console.log(newModelId)
+        //     requestUpdateModel(model.modelId, newModelId).catch(e => console.log(e))
+        // }
+    };
+    const handleButtonNavigate = (targetPath: To) => {
+        navigate(targetPath);
+    };
+
+    const handleDivInput = (e: React.FormEvent<HTMLDivElement>) => {
+        const content = e.currentTarget.textContent || "";
+        console.log(content);
+        setNewModelId(content);
+    };
+
+    const openModal = useCallback((model: ModelData) => {
         setSelectedModel(model);
+        setShowModal(true);
     }, []);
 
-    const RenderTimestamp = (timestamp: number) => Utility(timestamp);
+    const handleDownload =(modelId: string) => {
+        requestDownloadModel(modelId).catch(e => console.log(e))
+    }
+
+    const handleDownloadDataset =(modelId: string, datasetType: string) => {
+        requestDownloadDatasets(modelId, datasetType).catch(e => console.log(e))
+    }
+
+    function handleCopy(modelId: string) {
+        navigator.clipboard.writeText(modelId)
+            .then(() => {
+                console.log('Text copied to clipboard');
+            })
+            .catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+    }
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
 
     return (
-        <>
-            <h1>All the machine learning models</h1>
-            <Table striped bordered hover>
+        <Container>
+            <h1>All models</h1>
+            <Table striped bordered hover responsive>
                 <thead>
                 <tr>
                     <th>Model Id</th>
@@ -30,17 +114,79 @@ const ModelsTable: React.FC = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {models?.map((model) => (
-                    <tr key={model.modelId} onClick={() => handleRowClick(model)}>
-                        <td>{model.modelId}</td>
-                        <td>{RenderTimestamp(model.lastBuildAt)}</td>
+                {models?.map(model => (
+                    <tr key={model.modelId}>
                         <td>
-                            <Button variant="link">View</Button>
-                            <Button variant="link">Download</Button>
+                            <div className="d-flex flex-column flex-lg-row align-items-center">
+                                <div ref={el => editableDivRefs.current[model.modelId] = el as HTMLDivElement}
+                                     className="p-2 mb-2 mb-lg-0"
+                                     style={{cursor: 'pointer', width: '105px', textAlign: 'left'}}
+                                     contentEditable={editableModelId === model.modelId}
+                                     onInput={(e) => handleDivInput(e)}
+                                     suppressContentEditableWarning={true}>
+                                    {model.modelId}
+                                </div>
+                                <div className="d-flex flex-grow-1 justify-content-start justify-content-lg-center">
+                                    <ActionButton onClick={() => openModal(model)}
+                                                  tooltip={`View Config ${model.modelId}`}
+                                                  id={`view-config-tooltip-${model.modelId}`} placement="top">
+                                        <BsEye/>
+                                    </ActionButton>
+                                    <ActionButton onClick={() => handleDownload(model.modelId)}
+                                                  tooltip={`Download ${model.modelId}`}
+                                                  id={`download-tooltip-${model.modelId} `} placement="top">
+                                        <BsDownload/>
+                                    </ActionButton>
+                                    <ActionButton onClick={() => toggleEdit(model.modelId)}
+                                                  tooltip={`Edit ${model.modelId}`}
+                                                  id={`edit-tooltip-${model.modelId}`}
+                                                  placement="top">
+                                        {editableModelId === model.modelId ? <BsSave2 /> : <BsPencil/>}
+                                    </ActionButton>
+                                    <ActionButton onClick={() => handleCopy(model.modelId)}
+                                                  tooltip={`Copy ${model.modelId}`} id={`copy-tooltip-${model.modelId}`}
+                                                  placement="top">
+                                        <CopyIcon/>
+                                    </ActionButton>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{ConvertTimeStamp(model.lastBuildAt)}</td>
+                        <td>
+
+                            <ActionButton
+                                onClick={() => handleButtonNavigate(`/datasets/${model.modelId}/train`)}
+                                tooltip={`View Config ${model.modelId}`}
+                                id={`view-config-tooltip-${model.modelId}`}
+                                placement="top"
+                                icon={<BsCamera/>}
+                                buttonText="View"
+                            />
+                            <ActionButton
+                                onClick={() => handleDownloadDataset(model.modelId, "train")}
+                                tooltip={`View Config ${model.modelId}`}
+                                id={`view-config-tooltip-${model.modelId}`}
+                                placement="top"
+                                icon={<BsDownload/>}
+                                buttonText="Download"/>
                         </td>
                         <td>
-                            <Button variant="link">View</Button>
-                            <Button variant="link">Download</Button>
+                            <ActionButton
+                                onClick={() => handleButtonNavigate(`/datasets/${model.modelId}/test`)}
+                                tooltip={`View Config ${model.modelId}`}
+                                id={`view-config-tooltip-${model.modelId}`}
+                                placement="top"
+                                icon={<BsCamera/>}
+                                buttonText="View"
+                            />
+                            <ActionButton
+                                onClick={() => handleDownloadDataset(model.modelId, "test")}
+                                tooltip={`View Config ${model.modelId}`}
+                                id={`view-config-tooltip-${model.modelId}`}
+                                placement="top"
+                                icon={<BsDownload/>}
+                                buttonText="Download"
+                            />
                         </td>
                         <td>
                             <DropdownButton id="dropdown-item-button" title="Select an action">
@@ -54,27 +200,30 @@ const ModelsTable: React.FC = () => {
                 </tbody>
             </Table>
 
-            {selectedModel && (
-                <Card>
-                    <Card.Header>Build config for {selectedModel.modelId}:</Card.Header>
-                    <Card.Body>
-                        <pre>
-                            {JSON.stringify(selectedModel.buildConfig, null, 2)}
-                        </pre>
-                    </Card.Body>
-                </Card>
-            )}
-
             <div className="my-3">
                 <Button variant="danger">Delete All Models</Button>
             </div>
             <Pagination>
-                <Pagination.Prev />
+                <Pagination.Prev/>
                 <Pagination.Item active>{1}</Pagination.Item>
-                <Pagination.Next />
+                <Pagination.Next/>
             </Pagination>
-        </>
+
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Build config for {selectedModel?.modelId}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <pre>{JSON.stringify(selectedModel?.buildConfig, null, 2)}</pre>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </Container>
     );
 };
 
-export default ModelsTable;
+export default AllModels;
