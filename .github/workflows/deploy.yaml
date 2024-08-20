@@ -25,6 +25,13 @@ jobs:
 #        run: npm run lint -- --max-warnings=0
 
       - name: Build the React app
+        env:
+          REACT_APP_OKTA_CLIENT_ID: ${{ secrets.REACT_APP_OKTA_CLIENT_ID }}
+          REACT_APP_OKTA_ISSUER: ${{ secrets.REACT_APP_OKTA_ISSUER }}
+          REACT_APP_OKTA_REDIRECT_URI: ${{ secrets.REACT_APP_OKTA_REDIRECT_URI }}
+          REACT_APP_OKTA_SCOPES: ${{ secrets.REACT_APP_OKTA_SCOPES }}
+          REACT_APP_OKTA_PKCE: ${{ secrets.REACT_APP_OKTA_PKCE }}
+          REACT_APP_OKTA_DISABLE_HTTPS_CHECK: ${{ secrets.REACT_APP_OKTA_DISABLE_HTTPS_CHECK }}
         run: npm run build
 
       - name: Configure Git
