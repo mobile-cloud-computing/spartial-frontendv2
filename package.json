@@ -41,6 +41,7 @@
     "victory-chart": "^37.0.2",
     "web-vitals": "^2.1.4"
   },
+  "homepage": "https://mobile-cloud-computing.github.io/spartial-frontendv2/",
   "scripts": {
     "start": "cross-env HOST=0.0.0.0 PORT=3000 REACT_APP_ENV=development react-scripts start",
     "build": "CI=false cross-env HOST=0.0.0.0 PORT=3000 REACT_APP_ENV=production react-scripts build",
