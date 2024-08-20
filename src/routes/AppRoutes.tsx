@@ -73,11 +73,11 @@ const routeConfig: RouteConfig[] = [
   { path: "/Metrics/EvasionImpact", Component: EvasionImpact },
   { path: "/Metrics/ConsistencyMetric", Component: ConsistencyMetric },
   { path: "/XAI/XAIHomepage", Component: XAIHomepage },
-  { path: "*", Component: NoMatchComponent, isProtected: false },
   { path: "/Metrics/CompacityMetric", Component: CompacityMetric },
   { path: "/ModelSpecific", Component: ModelSpecific },
   { path: "/data/all", Component: AllWithSecureData },
   { path: "/about", Component: AboutUs, isProtected: false },
+  { path: "*", Component: NoMatchComponent, isProtected: false },
 ];
 const AppRoutes: React.FC = () => (
   <Routes>
