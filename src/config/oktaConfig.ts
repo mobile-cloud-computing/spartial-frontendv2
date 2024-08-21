@@ -1,10 +1,7 @@
 
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+// const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-const protocol = isLocalhost ? 'http' : 'https';
-
-const redirectUri = `${protocol}://${window.location.hostname}:3000/login/callback`;
-
+const redirectUri = `${window.location.origin}/login/callback`;
 // Okta configuration object
 export const oktaConfig = {
     clientId: process.env.REACT_APP_OKTA_CLIENT_ID || '',
