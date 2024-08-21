@@ -13,7 +13,7 @@ export const SERVER_PORT = process.env.SERVER_PORT || 8000;
 // Determine the URLs based on environment
 export const LOCAL_URL = `http://${LOCAL_HOST}:${LOCAL_PORT}`;
 export const SERVER_URL = isProduction
-    ? `http://${SERVER_HOST}:${SERVER_PORT}`
+    ? `https://${SERVER_HOST}:${SERVER_PORT}`
     : LOCAL_URL;
 
 // export const WITHSECURE_URL = isProduction
