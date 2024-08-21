@@ -1,5 +1,5 @@
 import axios, {AxiosResponse} from "axios";
-import {LOCAL_URL, SERVER_URL, WITHSECURE_URL} from "../constants";
+import {LOCAL_URL, SERVER_URL} from "../constants";
 import {
     DatasetType,
     TParamType,
@@ -202,8 +202,7 @@ const BlobDownload = (response: Blob | null, modelId: any, datasetType: any) => 
     link.href = url;
 
     if (datasetType) {
-        const datasetFileName = `${modelId}_${datasetType.charAt(0).toUpperCase() + datasetType.slice(1)}_samples.csv`;
-        link.download = datasetFileName;
+        link.download = `${modelId}_${datasetType.charAt(0).toUpperCase() + datasetType.slice(1)}_samples.csv`;
 
     } else {
         link.download = `${modelId}.bin`;
@@ -314,15 +313,15 @@ export const requestBuildConfigModel = async (modelId: string) => {
 }
 
 export const enhancedInterpretability = async (file: FormData) => {
-    return await makeApiRequest<any>(`/enhanced/interpretability/explain`, 'post', file, 'blob');
+    return await makeApiRequest<any>(`${SERVER_URL}/enhanced/interpretability/explain`, 'post', file, 'blob');
 }
 
 export const fairnessAPI = async (file: FormData) => {
-    return await makeApiRequest<any>(`/explain_fairness/file`, 'post', file, 'blob');
+    return await makeApiRequest<any>(`${SERVER_URL}/explain_fairness/file`, 'post', file, 'blob');
 }
 
 export const differentialPrivacy = async (formData: FormState) => {
-    return await makeApiRequest<any>(`/api/v3/differential_privacy/execute`, 'post', formData);
+    return await makeApiRequest<any>(`${SERVER_URL}/api/v3/differential_privacy/execute`, 'post', formData);
 }
 
 //medical 
@@ -332,14 +331,13 @@ export const MIEmergencyModels = async (modelFile: File) => {
         const formData = new FormData();
         formData.append('model_file', modelFile);
 
-        const response = await makeApiRequest<any>(
-            '/model/',
+        return await makeApiRequest<any>(
+            `${SERVER_URL}/model/`,
             'post',
             formData,
             'json'
         );
 
-        return response;
     } catch (error) {
         // Handle errors as needed
         console.error('Error in MIEmergencyModels:', error);
@@ -351,7 +349,7 @@ export const MIEmergencyModels = async (modelFile: File) => {
 //     return await makeApiRequest<any>(`/model/`);
 // }
 export const requestMedicalModels = async (): Promise<MedicalModel[]> => {
-    const response = await makeApiRequest<any[]>(`/model/?limit=10000`);
+    const response = await makeApiRequest<any[]>(`${SERVER_URL}/model/?limit=10000`);
     if (!response) {
         throw new Error('Failed to fetch medical models');
     }
@@ -359,7 +357,7 @@ export const requestMedicalModels = async (): Promise<MedicalModel[]> => {
 };
 
 export const deleteMedicalModel = async (modelId: string) => {
-    const url = `/model/${modelId}`;
+    const url = `${SERVER_URL}/model/${modelId}`;
     console.log(`Making DELETE request to ${url}`);
     try {
         const response = await makeApiRequest<{ result: string }>(url, 'delete');
@@ -373,16 +371,16 @@ export const deleteMedicalModel = async (modelId: string) => {
     }
 };
 export const demoMIEmergency = async (limit: number) => {
-    return await makeApiRequest<any>(`/emergency_detection/mi_detection/emergency_data?limit=${limit}`);
+    return await makeApiRequest<any>(`${SERVER_URL}/emergency_detection/mi_detection/emergency_data?limit=${limit}`);
 }
 
 export const demoMIEmergencyData = async (data_id: string) => {
-    return await makeApiRequest<any>(`/emergency_detection/mi_detection/emergency_data/${data_id}`);
+    return await makeApiRequest<any>(`${SERVER_URL}/emergency_detection/mi_detection/emergency_data/${data_id}`);
 }
 
 export const predictMIEmergencies = async (dat: string, hea: string, store_data: string) => {
     try {
-        let apiUrl = '/emergency_detection/mi_detection/predict';
+        let apiUrl = `${SERVER_URL}/emergency_detection/mi_detection/predict`;
 
         const requestBody = {
             dat: dat,
@@ -393,9 +391,8 @@ export const predictMIEmergencies = async (dat: string, hea: string, store_data:
             apiUrl += `?store_data=${store_data}`;
         }
 
-        const response = await makeApiRequest<any>(apiUrl, 'post', requestBody, 'json');
+        return await makeApiRequest<any>(apiUrl, 'post', requestBody, 'json');
 
-        return response;
     } catch (error) {
         // Handle errors as needed
         console.error('Error in predictMIEmergencies:', error);
@@ -411,14 +408,13 @@ export const detectMIEmergencies = async (dat: string, hea: string) => {
             hea: hea
         };
 
-        const response = await makeApiRequest<any>(
-            `/emergency_detection/mi_detection/explain`,
+        return await makeApiRequest<any>(
+            `${SERVER_URL}/emergency_detection/mi_detection/explain`,
             'post',
             requestBody,
             'blob'
         );
 
-        return response;
     } catch (error) {
         // Handle errors as needed
         console.error('Error in detectMIEmergencies:', error);
@@ -430,34 +426,34 @@ export const detectMIEmergencies = async (dat: string, hea: string) => {
 // }
 
 export const descriptionECGSignal = async (user_role: string, with_segments: string) => {
-    const url = `/user_support/descriptions/ecg?user_role=${user_role}&with_segments=${with_segments}`;
+    const url = `${SERVER_URL}/user_support/descriptions/ecg?user_role=${user_role}&with_segments=${with_segments}`;
     return await makeApiRequest<any>(url);
 }
 
 export const descriptionTickImportance = async (xai_visualization_approach: string, user_role: string) => {
-    const url = `/user_support/descriptions/xai_visualization_approaches/tickImportance?user_role=${user_role}`;
+    const url = `${SERVER_URL}/user_support/descriptions/xai_visualization_approaches/tickImportance?user_role=${user_role}`;
     return await makeApiRequest<any>(url);
 }
 
 export const descriptionTimeImportance = async (xai_visualization_approach: string, user_role: string) => {
-    const url = `/user_support/descriptions/xai_visualization_approaches/timeSegmentImportance?user_role=${user_role}`;
+    const url = `${SERVER_URL}/user_support/descriptions/xai_visualization_approaches/timeSegmentImportance?user_role=${user_role}`;
     return await makeApiRequest<any>(url);
 }
 
 export const descriptionLeadImportance = async (xai_visualization_approach: string, user_role: string) => {
-    const url = `/user_support/descriptions/xai_visualization_approaches/channelImportance?user_role=${user_role}`;
+    const url = `${SERVER_URL}/user_support/descriptions/xai_visualization_approaches/channelImportance?user_role=${user_role}`;
     return await makeApiRequest<any>(url);
 }
 
 
 export const descriptionECGClassification = async (user_role: string) => {
-    const url = `/user_support/descriptions/classification_prediction?user_role=${user_role}`;
+    const url = `${SERVER_URL}/user_support/descriptions/classification_prediction?user_role=${user_role}`;
     return await makeApiRequest<any>(url);
 }
 
 export const MI_ModelPrediction = async (dat: string, hea: string, model_id: string) => {
     try {
-        const url = `/model/${model_id}/predict`;
+        const url = `${SERVER_URL}/model/${model_id}/predict`;
 
         const requestBody = {
             dat: dat,
@@ -465,9 +461,7 @@ export const MI_ModelPrediction = async (dat: string, hea: string, model_id: str
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'json');
-
-        return response;
+        return  await makeApiRequest<any>(url, 'post', requestBody, 'json');
 
     } catch (error) {
         // Handle errors as needed
@@ -476,14 +470,14 @@ export const MI_ModelPrediction = async (dat: string, hea: string, model_id: str
     }
 }
 export const MI_ModelEvaluate = async (model_id: string, dataset: string) => {
-    const url = `/model/${model_id}/evaluate?dataset=${dataset}`;
+    const url = `${SERVER_URL}/model/${model_id}/evaluate?dataset=${dataset}`;
     return await makeApiRequest<any>(url);
 }
 
 //Tick Importance
 export const LRP_TICK_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `/medical_analysis/ecg_analysis/explain/LRP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/LRP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -491,9 +485,7 @@ export const LRP_TICK_Visualize = async (dat: string, hea: string, model_id: str
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'blob');
-
-        return response;
+        return await makeApiRequest<any>(url, 'post', requestBody, 'blob');
 
     } catch (error) {
         // Handle errors as needed
@@ -504,7 +496,7 @@ export const LRP_TICK_Visualize = async (dat: string, hea: string, model_id: str
 
 export const GradientSHAP_TICK_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `/medical_analysis/ecg_analysis/explain/GradientSHAP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/GradientSHAP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -512,9 +504,8 @@ export const GradientSHAP_TICK_Visualize = async (dat: string, hea: string, mode
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'blob');
+       return  await makeApiRequest<any>(url, 'post', requestBody, 'blob');
 
-        return response;
 
     } catch (error) {
         // Handle errors as needed
@@ -525,7 +516,7 @@ export const GradientSHAP_TICK_Visualize = async (dat: string, hea: string, mode
 
 export const DeepSHAP_TICK_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `/medical_analysis/ecg_analysis/explain/DeepSHAP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/DeepSHAP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -533,9 +524,7 @@ export const DeepSHAP_TICK_Visualize = async (dat: string, hea: string, model_id
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'blob');
-
-        return response;
+        return await makeApiRequest<any>(url, 'post', requestBody, 'blob');
 
     } catch (error) {
         // Handle errors as needed
@@ -548,7 +537,7 @@ export const DeepSHAP_TICK_Visualize = async (dat: string, hea: string, model_id
 export const LRP_TIME_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
 
-        const url = `/medical_analysis/ecg_analysis/explain/LRP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/LRP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -556,9 +545,7 @@ export const LRP_TIME_Visualize = async (dat: string, hea: string, model_id: str
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'blob');
-
-        return response;
+        return  await makeApiRequest<any>(url, 'post', requestBody, 'blob');
 
     } catch (error) {
         // Handle errors as needed
@@ -569,7 +556,7 @@ export const LRP_TIME_Visualize = async (dat: string, hea: string, model_id: str
 
 export const GradientSHAP_TIME_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `/medical_analysis/ecg_analysis/explain/GradientSHAP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/GradientSHAP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -577,9 +564,8 @@ export const GradientSHAP_TIME_Visualize = async (dat: string, hea: string, mode
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'blob');
+       return await makeApiRequest<any>(url, 'post', requestBody, 'blob');
 
-        return response;
 
     } catch (error) {
         // Handle errors as needed
@@ -590,7 +576,7 @@ export const GradientSHAP_TIME_Visualize = async (dat: string, hea: string, mode
 
 export const DeepSHAP_TIME_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `/medical_analysis/ecg_analysis/explain/DeepSHAP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/DeepSHAP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -598,9 +584,7 @@ export const DeepSHAP_TIME_Visualize = async (dat: string, hea: string, model_id
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'blob');
-
-        return response;
+        return  await makeApiRequest<any>(url, 'post', requestBody, 'blob');
 
     } catch (error) {
         console.error('Error in DeepSHAP_TIME_Visualize:', error);
@@ -612,7 +596,7 @@ export const DeepSHAP_TIME_Visualize = async (dat: string, hea: string, model_id
 //Lead Importance
 export const LRP_LEAD_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `/medical_analysis/ecg_analysis/explain/LRP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/LRP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -620,9 +604,7 @@ export const LRP_LEAD_Visualize = async (dat: string, hea: string, model_id: str
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'blob');
-
-        return response;
+        return  await makeApiRequest<any>(url, 'post', requestBody, 'blob');
 
     } catch (error) {
         console.error('Error in LRP_LEAD_Visualize:', error);
@@ -632,18 +614,14 @@ export const LRP_LEAD_Visualize = async (dat: string, hea: string, model_id: str
 
 export const GradientSHAP_LEAD_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `/medical_analysis/ecg_analysis/explain/GradientSHAP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/GradientSHAP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
             hea: hea,
         };
 
-
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'blob');
-
-        return response;
-
+        return  await makeApiRequest<any>(url, 'post', requestBody, 'blob');
     } catch (error) {
         // Handle errors as needed
         console.error('Error in GradientSHAP_LEAD_Visualize:', error);
@@ -653,7 +631,7 @@ export const GradientSHAP_LEAD_Visualize = async (dat: string, hea: string, mode
 
 export const DeepSHAP_LEAD_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `/medical_analysis/ecg_analysis/explain/DeepSHAP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/DeepSHAP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -661,9 +639,7 @@ export const DeepSHAP_LEAD_Visualize = async (dat: string, hea: string, model_id
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'blob');
-
-        return response;
+        return  await makeApiRequest<any>(url, 'post', requestBody, 'blob');
 
     } catch (error) {
         // Handle errors as needed
@@ -676,7 +652,7 @@ export const DeepSHAP_LEAD_Visualize = async (dat: string, hea: string, model_id
 export const visualizeECG = async (dat: string, hea: string, cut_classification_window: string) => {
     try {
 
-        let apiUrl = '/medical_analysis/ecg_analysis/visualize_ecg';
+        let apiUrl = `${SERVER_URL}/medical_analysis/ecg_analysis/visualize_ecg`;
 
         const requestBody = {
             dat: dat,
@@ -687,9 +663,7 @@ export const visualizeECG = async (dat: string, hea: string, cut_classification_
             apiUrl += `?cut_classification_window=${cut_classification_window}`;
         }
 
-        const response = await makeApiRequest<any>(apiUrl, 'post', requestBody, 'blob');
-
-        return response;
+        return await makeApiRequest<any>(apiUrl, 'post', requestBody, 'blob');
 
     } catch (error) {
         // Handle errors as needed
@@ -701,7 +675,7 @@ export const visualizeECG = async (dat: string, hea: string, cut_classification_
 
 export const MIModelExplanation = async (dat: string, hea: string, model_id: string, xai_method: string, ignore_cached_relevances: string) => {
     try {
-        const url = `/model/${model_id}/explain/${xai_method}?ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${SERVER_URL}/model/${model_id}/explain/${xai_method}?ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -709,9 +683,7 @@ export const MIModelExplanation = async (dat: string, hea: string, model_id: str
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'json');
-
-        return response;
+        return  await makeApiRequest<any>(url, 'post', requestBody, 'json');
 
     } catch (error) {
         // Handle errors as needed
@@ -727,14 +699,12 @@ export const identifySegments = async (dat: string, hea: string) => {
             hea: hea
         };
 
-        const response = await makeApiRequest<any>(
-            `/medical_analysis/ecg_analysis/identify_segments`,
+        return await makeApiRequest<any>(
+            `${SERVER_URL}/medical_analysis/ecg_analysis/identify_segments`,
             'post',
             requestBody,
             'blob'
         );
-
-        return response;
     } catch (error) {
         // Handle errors as needed
         console.error('Error in identifySegments:', error);
@@ -748,15 +718,13 @@ export const tickImportance = async (dat: string, hea: string, xai_method: strin
             dat: dat,
             hea: hea
         };
-
-        const response = await makeApiRequest<any>(
-            `medical_analysis/ecg_analysis/explain/${xai_method}/tick_importance?model_id=${model_id}`,
+    return  await makeApiRequest<any>(
+            `${SERVER_URL}/medical_analysis/ecg_analysis/explain/${xai_method}/tick_importance?model_id=${model_id}`,
             'post',
             requestBody,
             'blob'
         );
 
-        return response;
     } catch (error) {
         // Handle errors as needed
         console.error('Error in tickImportance:', error);
@@ -771,14 +739,12 @@ export const timeImportance = async (dat: string, hea: string, xai_method: strin
             hea: hea
         };
 
-        const response = await makeApiRequest<any>(
-            `/medical_analysis/ecg_analysis/explain/${xai_method}/time_importance?model_id=${model_id}`,
+        return await makeApiRequest<any>(
+            `${SERVER_URL}/medical_analysis/ecg_analysis/explain/${xai_method}/time_importance?model_id=${model_id}`,
             'post',
             requestBody,
             'blob'
         );
-
-        return response;
     } catch (error) {
         // Handle errors as needed
         console.error('Error in timeImportance:', error);
@@ -794,14 +760,12 @@ export const leadImportance = async (dat: string, hea: string, xai_method: strin
             hea: hea
         };
 
-        const response = await makeApiRequest<any>(
-            `/medical_analysis/ecg_analysis/explain/${xai_method}/lead_importance?model_id=${model_id}`,
+        return await makeApiRequest<any>(
+            `${SERVER_URL}/medical_analysis/ecg_analysis/explain/${xai_method}/lead_importance?model_id=${model_id}`,
             'post',
             requestBody,
             'blob'
         );
-
-        return response;
     } catch (error) {
         // Handle errors as needed
         console.error('Error in leadImportance:', error);
@@ -810,14 +774,14 @@ export const leadImportance = async (dat: string, hea: string, xai_method: strin
 }
 
 export const getSpecificModel = async (model_id: string) => {
-    return await makeApiRequest<any>(`/model/${model_id}`);
+    return await makeApiRequest<any>(`${SERVER_URL}/model/${model_id}`);
 }
 
 //Llama Service
 
 export const Llama_Service = async (user: string, content: string) => {
     try {
-        const url = `/llama/change-text`;
+        const url = `${SERVER_URL}/llama/change-text`;
 
         const requestBody = {
             user: user,
@@ -825,9 +789,7 @@ export const Llama_Service = async (user: string, content: string) => {
         };
 
 
-        const response = await makeApiRequest<any>(url, 'post', requestBody, 'json');
-
-        return response;
+        return  await makeApiRequest<any>(url, 'post', requestBody, 'json');
 
     } catch (error) {
         // Handle errors as needed
@@ -846,14 +808,13 @@ export const clf_accuracy_metric = async (ground_truth: number[], predictions: n
             predictions: predictions
         };
 
-        const response = await makeApiRequest<any>(
-            `/clf_accuracy_metric`,
+        return await makeApiRequest<any>(
+            `${SERVER_URL}/clf_accuracy_metric`,
             'post',
             requestBody,
             'json'
         );
 
-        return response;
     } catch (error) {
         // Handle errors as needed
         console.error('Error in clf_accuracy_metric:', error);
@@ -868,14 +829,12 @@ export const evasion_impact_metric = async (ground_truth: number[], predictions:
             predictions: predictions
         };
 
-        const response = await makeApiRequest<any>(
-            `/evasion_impact_metric`,
+        return await makeApiRequest<any>(
+            `${SERVER_URL}/evasion_impact_metric`,
             'post',
             requestBody,
             'json'
         );
-
-        return response;
     } catch (error) {
         // Handle errors as needed
         console.error('Error in evasion_impact_metric:', error);
@@ -892,7 +851,7 @@ interface ContributionDict {
 export const consistencyMetricAPI = async (data: { contribution_dict: ContributionDict }): Promise<any> => {
     try {
         const response = await makeApiRequest<any>(
-            '/consistency_metric',
+            `${SERVER_URL}/consistency_metric`,
             'post',
             data, // Pass the entire data object directly
             'json'
@@ -908,7 +867,7 @@ export const consistencyMetricAPI = async (data: { contribution_dict: Contributi
 export const consistencyMetricAPIPlot = async (data: { contribution_dict: ContributionDict }): Promise<any> => {
     try {
         const response = await makeApiRequest<any>(
-            '/consistency_metric_plot',
+            `${SERVER_URL}/consistency_metric_plot`,
             'post',
             data, // Pass the entire data object directly
             'blob'
@@ -938,7 +897,7 @@ export const compacityMetricAPI = async (data: {
     try {
 
         const response = await makeApiRequest<any>(
-            '/compacity_metric',
+            `${SERVER_URL}/compacity_metric`,
             'post',
             data,
             'json'
@@ -960,7 +919,7 @@ export const compacityMetricAPIPlot = async (data: {
 }): Promise<any> => {
     try {
         const response = await makeApiRequest<any>(
-            '/compacity_metric_plot',
+            `${SERVER_URL}/compacity_metric_plot`,
             'post',
             data, // Pass the entire data object directly
             'blob'
@@ -993,31 +952,27 @@ export const xaiAPI = async (xai_method: string, image: File, mlModel: File, ima
         }
 
         if (xai_method == 'lime') {
-            const response = await makeApiRequest<any>(
-                `/explain_lime/image?imagetype=${imagetype}`,
+            return await makeApiRequest<any>(
+                `${SERVER_URL}/explain_lime/image?imagetype=${imagetype}`,
                 'post',
                 requestBody,
                 'json'
             );
-            return response;
         } else if (xai_method == 'shap') {
-            const response = await makeApiRequest<any>(
-                `/explain_shap/image?imagetype=${imagetype}`,
+            return await makeApiRequest<any>(
+                `${SERVER_URL}/explain_shap/image?imagetype=${imagetype}`,
                 'post',
                 requestBody,
                 'json'
             );
-            return response;
         } else if (xai_method == 'occ') {
-            const response = await makeApiRequest<any>(
-                `/explain_occlusion/image?imagetype=${imagetype}`,
+            return await makeApiRequest<any>(
+                `${SERVER_URL}/explain_occlusion/image?imagetype=${imagetype}`,
                 'post',
                 requestBody,
                 'json'
             );
-            return response;
         }
-
 
     } catch (error) {
         // Handle errors as needed
@@ -1063,8 +1018,7 @@ export const requestRunShap = async (modelId: string, numberBackgroundSamples: n
 export const fetchSHAPValues = async (modelId: string, labelIndex: number) => {
     const labelsList = getLabelsListXAI(modelId);
     const url = `${LOCAL_URL}/api/xai/shap/explanations/${modelId}/${labelIndex}`
-    const shapValues = await makeApiRequest(url, 'get', {labelsList});
-    return shapValues;
+    return await makeApiRequest(url, 'get', {labelsList});
 }
 
 export const requestRetrainModelAC = async (modelId: string, trainingDataset: string, testingDataset: string, modelType: TODO) => {
@@ -1085,8 +1039,7 @@ export const requestRetrainModelAC = async (modelId: string, trainingDataset: st
 }
 
 export const requestRetrainStatusAC = async () => {
-    const response = await makeApiRequest(`${LOCAL_URL}/api/ac/retrain`);
-    return response
+    return await makeApiRequest(`${LOCAL_URL}/api/ac/retrain`);
 }
 
 export const requestRetrainModel = async (modelId: string, trainingDataset: string, testingDataset: string, params: any) => {
@@ -1116,7 +1069,7 @@ export const deleteModel = async (modelId: string) => {
 //WithSecure
 
 export const requestWithSecureModels = async (): Promise<WithSecureModel[]> => {
-    const response = await makeApiRequest<any[]>(`/models`);
+    const response = await makeApiRequest<any[]>(`${SERVER_URL}/models`);
     console.log(response);
     if (!response) {
         throw new Error('Failed to fetch medical models');
@@ -1133,7 +1086,7 @@ export const PostWithSecureModels = async (file: File, name: string, version: st
         formData.append("version", version);
         formData.append("classname", classname);
 
-        const response = await fetch('/models', {
+        const response = await fetch(`${SERVER_URL}/models`, {
             method: 'POST',
             body: formData,
 
@@ -1165,12 +1118,11 @@ type DataItem = {
 
 export const requestWithSecureData = async (): Promise<DataItem[]> => {
     try {
-        const response = await fetch(`/data`);
+        const response = await fetch(`${SERVER_URL}/data`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data: DataItem[] = await response.json();
-        return data;
+        return await response.json();
     } catch (error) {
         console.error("Error fetching data:", error);
         throw error;
@@ -1183,7 +1135,7 @@ export const PostWithSecureData = async (file: File, classname: string) => {
         formData.append("file", file);
         formData.append("classname", classname);
 
-        const response = await fetch('/data', {
+        const response = await fetch('${SERVER_URL}/data', {
             method: 'POST',
             body: formData,
 
@@ -1204,8 +1156,7 @@ export const PostWithSecureData = async (file: File, classname: string) => {
 export const withSecureAttack = async (formData: any) => {
     try {
         console.log(formData);
-        const response = await makeApiRequest<any>(`/attacks`, "post", formData);
-        return response
+        return await makeApiRequest<any>(`${SERVER_URL}/attacks`, "post", formData);
     } catch (error) {
         console.error('Error calling API:', error);
     }
@@ -1213,7 +1164,7 @@ export const withSecureAttack = async (formData: any) => {
 
 export const requestWithSecureAttackStatus = async () => {
     try {
-        return await makeApiRequest<any[]>(`/attacks`);
+        return await makeApiRequest<any[]>(`${SERVER_URL}/attacks`);
     } catch (error) {
         console.error('Error calling API:', error);
     }
@@ -1221,7 +1172,7 @@ export const requestWithSecureAttackStatus = async () => {
 
 export const requestWithSecureSingleAttackStatus = async (id: string) => {
     try {
-        return await makeApiRequest<any[]>(`/attacks/${id}`);
+        return await makeApiRequest<any[]>(`${SERVER_URL}/attacks/${id}`);
     } catch (error) {
         console.error('Error calling API:', error);
     }
