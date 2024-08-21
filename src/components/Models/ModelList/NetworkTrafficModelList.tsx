@@ -40,7 +40,7 @@ const NetworkTrafficModelList: FC<ModelListProps> = () => {
             const updatedModels = await requestAllModels();
             setModelList(updatedModels);
         };
-        fetchModels();
+        fetchModels().then(r => console.log(r));
     }, []);
 
     const handleButtonNavigate = (targetPath: string) => navigate(targetPath);

@@ -6,7 +6,7 @@ interface DataModel {
     resultData: string[];
 }
 
-const useFdetchModelDataset = (isPoisoned: boolean, modelId: string, attackType: string) => {
+const useFetchModelDataset = (isPoisoned: boolean, modelId: string, attackType: string) => {
     const [originalDataset, setOriginalDataset] = useState<DataModel>({resultData: []});
     const [poisonedDataset, setPoisonedDataset] = useState<DataModel>({resultData: []});
     const [error, setError] = useState<Error | null>(null);
@@ -16,7 +16,7 @@ const useFdetchModelDataset = (isPoisoned: boolean, modelId: string, attackType:
     useEffect(() => {
         fetchNormalData()
             // fetchPoisonedData()
-    }, [loading, modelId, attackType, isPoisoned]);
+    }, [modelId, attackType, isPoisoned]);
     
     const fetchNormalData = useCallback(async () => {
         if (!modelId) return;
@@ -45,13 +45,13 @@ const useFdetchModelDataset = (isPoisoned: boolean, modelId: string, attackType:
     }, [modelId]);
     
 
-    useEffect(() => {
-        if (isPoisoned) {
-            // fetchPoisonedData();
-        } else {
-            fetchNormalData();
-        }
-    }, [fetchNormalData,  isPoisoned]);
+    // useEffect(() => {
+    //     if (isPoisoned) {
+    //         fetchPoisonedData();
+    //     } else {
+    //         fetchNormalData();
+    //     }
+    // }, [fetchNormalData,  isPoisoned]);
 
     return {
         poisonedDataset,
@@ -60,4 +60,4 @@ const useFdetchModelDataset = (isPoisoned: boolean, modelId: string, attackType:
         loading,
     };
 };
-export default useFdetchModelDataset;
+export default useFetchModelDataset;
