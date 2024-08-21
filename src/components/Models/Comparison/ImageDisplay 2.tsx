@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ImageDisplayProps {
-    imageUrl: string | null; // Remove | undefined if imageUrl is always provided
+    imageUrl: string | null;
 }
 
 const ImageDisplay: React.FC<ImageDisplayProps> = ({imageUrl}) => {
@@ -9,7 +9,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({imageUrl}) => {
         <div>
             {imageUrl && (
                 <img
-                    src={`data:image/png;base64,${imageUrl}`}
+                    src={`data:image/png;base64,${process.env.PUBLIC_URL}/Logo.png`}
                     alt="Image"
                     style={{width: "100%", height: "100%", objectFit: "cover"}}
                 />

@@ -88,7 +88,7 @@ const Sidebar: React.FC = () => {
               className="text-decoration-none text-white ms-3 mt-3 d-none d-lg-block"
             >
               <img
-                src="/Spatial_Logo.png"
+                src={`${process.env.PUBLIC_URL}/Spatial_Logo.png`}
                 width="129"
                 height="39.5"
                 className="d-block"
@@ -101,7 +101,7 @@ const Sidebar: React.FC = () => {
               className="text-decoration-none text-white ms-3 mt-3 d-block d-md-none"
             >
               <img
-                src="/Logo.png"
+                src={`${process.env.PUBLIC_URL}/Logo.png`}
                 className="img-fluid"
                 alt="Compact Logo"
                 style={{ maxWidth: "129px", maxHeight: "39.5px" }}

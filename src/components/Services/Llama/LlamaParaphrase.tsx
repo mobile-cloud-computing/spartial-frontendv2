@@ -55,7 +55,7 @@ const LlamaParaphrase: React.FC<ParaphraseButtonProps> = ({
     <div>
       <button onClick={openModal} className="btn mt-2">
         <img
-          src="/LLAMA.png"
+          src={`${process.env.PUBLIC_URL}/LLAMA.png`}
           alt="Llama"
           style={{ width: "30px", marginRight: "10px" }}
         />
@@ -69,7 +69,7 @@ const LlamaParaphrase: React.FC<ParaphraseButtonProps> = ({
             </span>
             <h3>LLM Generated</h3>
             <img
-              src="/LLAMA.png"
+              src={`${process.env.PUBLIC_URL}/LLAMA.png`}
               alt="Llama"
               style={{ width: "30px", marginRight: "10px" }}
             />

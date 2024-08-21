@@ -1,7 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import useFetchModelDataset from "./useFetchModelDataset";
-import * as api from "../../api";
 
 interface TableComponentProps {
     modelIdProp?: string | null;
@@ -33,6 +32,7 @@ const TableComponent: React.FC<TableComponentProps> = ({modelIdProp, datasetType
             setViewDatasetModel(originalDataset.resultData);
         }
     }, [originalDataset, datasetType, modelId, modelIdProp]);
+    // originalDataset, datasetType, modelId, modelIdProp
 
     const [currentPage, setCurrentPage] = useState(1);
     // Assuming 10 rows per page
