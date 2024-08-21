@@ -27,6 +27,7 @@ jobs:
       - name: Build the React app
         env:
           SERVER_URL: ${{ secrets.SERVER_URL }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
           REACT_APP_OKTA_CLIENT_ID: ${{ secrets.REACT_APP_OKTA_CLIENT_ID }}
           REACT_APP_OKTA_ISSUER: ${{ secrets.REACT_APP_OKTA_ISSUER }}
           REACT_APP_OKTA_REDIRECT_URI: ${{ secrets.REACT_APP_OKTA_REDIRECT_URI }}

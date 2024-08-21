@@ -2,7 +2,7 @@
   "name": "spartial-frontendv2",
   "version": "0.1.0",
   "type": "module",
-  "proxy": "http://193.40.154.143:8000",
+  "proxy": "https://193.40.154.143:8000",
   "homepage": "https://mobile-cloud-computing.github.io/spartial-frontendv2",
   "private": true,
   "dependencies": {
