@@ -6,7 +6,7 @@ export const LOCAL_HOST = "127.0.0.1";
 export const LOCAL_PORT = 31057;
 
 // Production configuration
-export const SERVER_HOST = process.env.SERVER_HOST || "193.40.154.143";
+export const SERVER_HOST = process.env.SERVER_HOST || 'spatial-2024.netlify.app/.netlify/functions/proxy';
 export const SERVER_PORT = process.env.SERVER_PORT || 8000;
 // export const WITHSECURE_HOST = process.env.WITHSECURE_HOST || "193.40.154.143";
 
