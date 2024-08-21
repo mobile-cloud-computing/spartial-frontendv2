@@ -1,5 +1,5 @@
 // Check if the app is running in production
-const isProduction = process.env.NODE_ENV === 'production';
+// const isProduction = process.env.NODE_ENV === 'production';
 
 // Local configuration
 export const LOCAL_HOST = "127.0.0.1";
@@ -12,9 +12,7 @@ export const SERVER_PORT = process.env.SERVER_PORT || 8000;
 
 // Determine the URLs based on environment
 export const LOCAL_URL = `http://${LOCAL_HOST}:${LOCAL_PORT}`;
-export const SERVER_URL = isProduction
-    ? `https://${SERVER_HOST}:${SERVER_PORT}`
-    : LOCAL_URL;
+export const SERVER_URL = `https://${SERVER_HOST}:${SERVER_PORT}`
 
 // export const WITHSECURE_URL = isProduction
 //     ? `http://${WITHSECURE_HOST}`
