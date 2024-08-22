@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="refresh" content="0; url=./index.html" />
     <script type="text/javascript">
-        // Preserves the path after the redirect
+        // Check if the current path already starts with /spartial-frontendv2
         var pathname = window.location.pathname;
-        pathname = pathname.replace('/spartial-frontendv2', '');
-        window.location.href = '/spartial-frontendv2' + pathname;
+        if (!pathname.startsWith('/spartial-frontendv2')) {
+            pathname = pathname.replace('/spartial-frontendv2', '');
+            window.location.href = '/spartial-frontendv2' + pathname;
+        }
     </script>
     <title>Not found</title>
 </head>
