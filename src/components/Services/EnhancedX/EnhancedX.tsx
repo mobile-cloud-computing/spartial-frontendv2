@@ -53,7 +53,7 @@ const EnhancedX: React.FC = () => {
   return (
     <div className="container mt-5">
       {/* <h2 className="mb-4">Enhanced Interpretability Service</h2> */}
-      <Link to={fairnessHomepage} className="nav-link text-lightblue fs-5">
+      <Link to={fairnessHomepage} className="nav-link text-lightblue fs-4">
         Enhanced Interpretability Service
       </Link>
       <p>Insert an ECG Image to enhance the interpretability. </p>

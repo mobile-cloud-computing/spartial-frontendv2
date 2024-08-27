@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Form, InputGroup } from "react-bootstrap";
+import { Link, To } from "react-router-dom";
 import NetworkTrafficForm from "./NetworkTrafficForm";
 import { ServiceFormProps } from "../../../types/types";
 import MedicalServiceUploadForm from "./MedicalServiceUploadForm";
 import WithSecureServiceUploadForm from "./WithSecureServiceUploadForm";
+
+const BuildModel = "/build/ac";
 
 const serviceForms: { [key: string]: React.FC<ServiceFormProps> } = {
   "Network Traffic": NetworkTrafficForm,
@@ -39,14 +42,20 @@ const BuildModelForms: React.FC = () => {
   const { title, description } = serviceHeadings[serviceType];
 
   return (
-    <Container fluid>
-      <Row className="contentContainer justify-content-center">
+    <Container className="container mt-5">
+      <Row className="contentContainer ">
+        {" "}
+        {/*justify-content-center */}
         <Col md={10} lg={8}>
-          <h2>{title}</h2>
+          <Link to={BuildModel} className="nav-link text-lightblue fs-4">
+            {title}
+          </Link>
+          {/* <h2>{title}</h2> */}
           <p>{description}</p>
           <Form.Group as={Row} className="mb-3">
             <InputGroup>
               <InputGroup.Text>Service Type:</InputGroup.Text>
+
               <Form.Select
                 name="serviceType"
                 value={serviceType}

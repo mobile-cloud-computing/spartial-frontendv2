@@ -75,7 +75,7 @@ const AllWithSecureData: React.FC = () => {
   return (
     <>
       <div className="container mt-5">
-        <Link to={withsecureHomepage} className="nav-link text-lightblue fs-5">
+        <Link to={withsecureHomepage} className="nav-link text-lightblue fs-4">
           Add Data & Constraints
         </Link>
         <p></p>

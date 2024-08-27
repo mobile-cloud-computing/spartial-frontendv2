@@ -667,13 +667,17 @@ const AboutUs: React.FC = () => {
 
             {/* </p> */}
             <pre>
-              {`@inproceedings{ottunspatial,
-  title={The SPATIAL Architecture: Design and Development Experiences from Gauging and Monitoring the AI Inference Capabilities of Modern Applications},
-  author={Ottun, Abdul-Rasheed and Marasinghe, Rasinthe and Elemosho, Toluwani and Liyanage, Mohan and Ragab, Mohamad and Bagave, Prachi and Westberg, Marcus and Asadi, Mehrdad and Boerger, Michell and Sandeepa, Chamara and others},
-  booktitle={2024 IEEE 44th International Conference on Distributed Computing Systems (ICDCS)},
+              {`@INPROCEEDINGS{10630929,
+  author={Ottun, Abdul-Rasheed and Marasinghe, Rasinthe and Elemosho, Toluwani and Liyanage, Mohan and Ragab, Mohamad and Bagave, Prachi and Westberg, Marcus and Asadi, Mehrdad and Boerger, Michell and Sandeepa, Chamara and Senevirathna, Thulitha and Siniarski, Bartlomiej and Liyanage, Madhusanka and La, Vinh Hoa and Nguyen, Manh-Dung and De Oca, Edgardo Montes and Oomen, Tessa and Ferreira Gonçalves, João Fernando and Tanasković, Illija and Klopanovic, Sasa and Kourtellis, Nicolas and Soriente, Claudio and Pridmore, Jason and Cavalli, Ana Rosa and Draskovic, Drasko and Marchal, Samuel and Wang, Shen and Noguero, David Solans and Tcholtchev, Nikolay and Ding, Aaron Yi and Flores, Huber},
+  booktitle={2024 IEEE 44th International Conference on Distributed Computing Systems (ICDCS)}, 
+  title={The SPATIAL Architecture: Design and Development Experiences from Gauging and Monitoring the AI Inference Capabilities of Modern Applications}, 
   year={2024},
-  organization={IEEE}
-}`}
+  volume={},
+  number={},
+  pages={947-959},
+  keywords={Measurement;Biological system modeling;Roads;Pipelines;Systems architecture;Computer architecture;Safety;Trustworthy AI;AI Act;Industrial Use Cases;Accountability;Resilience;Human Oversight;Practical Trust-worthiness},
+  doi={10.1109/ICDCS60910.2024.00092}}
+`}
             </pre>
           </div>
           <div className="bibtex-entry">
@@ -681,16 +685,20 @@ const AboutUs: React.FC = () => {
               SPATIAL: Practical Trustworthiness with Human Oversight
             </h5> */}
             <h2 className="h4">
-              SPATIAL: Practical Trustworthiness with Human Oversight
+              SPATIAL: Practical AI Trustworthiness with Human Oversight
             </h2>
             <pre>
-              {`@article{ottunspatialdemo,
-  title={SPATIAL Architecture: Practical AI Trustworthiness with Human Oversight},
-  author={Ottun, Abdul-Rasheed and Marasinghe, Rasinthe and Elemosho, Toluwani and Ahmed, Hussein Ashfaq and others},
-  booktitle={2024 IEEE 44th International Conference on Distributed Computing Systems (ICDCS)},
+              {`@INPROCEEDINGS{10631052,
+  author={Ottun, Abdul-Rasheed and Marasinghe, Rasinthe and Elemosho, Toluwani and Liyanage, Mohan and Ahmed, Ashfaq Hussain and Boerger, Michell and Sandeepa, Chamara and Senevirathna, Thulitha and La, Vinh Hoa and Nguyen, Manh-Dung and Soriente, Claudio and Marchal, Samuel and Wang, Shen and Noguero, David Solans and Tcholtchev, Nikolay and Ding, Aaron Yi and Flores, Huber},
+  booktitle={2024 IEEE 44th International Conference on Distributed Computing Systems (ICDCS)}, 
+  title={SPATIAL: Practical AI Trustworthiness with Human Oversight}, 
   year={2024},
-  organization={IEEE}
-}`}
+  volume={},
+  number={},
+  pages={1427-1430},
+  keywords={Measurement;Decision making;Human in the loop;Safety;Complexity theory;Stakeholders;Artificial intelligence;Practical Trustworthiness;Artificial Intelligence;Fairness;Human oversight;Industrial Use Cases},
+  doi={10.1109/ICDCS60910.2024.00138}}
+`}
             </pre>
           </div>
         </div>
