@@ -61,7 +61,7 @@ export function useMenuData() {
         { id: 9, title: 'XAI', icon: 'bi bi-x-diamond-fill', path: '/XAI/XAIHomepage', secure: true },
 
         { id: 6, title: 'About', icon: 'bi bi-info-circle', path: '/about', secure: false}, // Changed icon for 'About'
-        { id: 7, title: 'Contact', icon: 'bi bi-telephone', path: '/contact', secure: false }, // Changed icon for 'Contact'
+        // { id: 7, title: 'Contact', icon: 'bi bi-telephone', path: '/contact', secure: false }, // Changed icon for 'Contact'
     ];
 
   

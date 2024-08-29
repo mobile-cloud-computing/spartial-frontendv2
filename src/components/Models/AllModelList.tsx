@@ -4,6 +4,9 @@ import { useParams } from "react-router-dom";
 import WithSecureModelList from "./ModelList/WithSecureModelList";
 import MedicalModelList from "./ModelList/MedicalModelList";
 import NetworkTrafficModelList from "./ModelList/NetworkTrafficModelList";
+import { Link, To } from "react-router-dom";
+
+const AllModels = "/models/all";
 
 const AllModelList: FC = () => {
   const { ac: routeModelId }: Record<string, string | undefined> =
@@ -12,8 +15,11 @@ const AllModelList: FC = () => {
   const [filterPrefix, setFilterPrefix] = useState<string>(routeModelId || "");
 
   return (
-    <Container fluid>
-      <h1>All models</h1>
+    <Container className="container mt-5">
+      <Link to={AllModels} className="nav-link text-lightblue fs-4">
+        All Models
+      </Link>
+      {/* <h1>All models</h1> */}
       <Form>
         <Form.Group controlId="filterPrefix">
           <Form.Label>Filter models by Services</Form.Label>

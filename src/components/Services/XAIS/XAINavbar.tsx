@@ -7,7 +7,7 @@ const metricsHomepage = "/XAIS/XAIHomepage";
 const XAINavbar: React.FC = () => {
   return (
     <>
-      <Link to={metricsHomepage} className="nav-link text-lightblue fs-5">
+      <Link to={metricsHomepage} className="nav-link text-lightblue fs-4 mt-4">
         XAI Service
       </Link>
       <BootstrapNavbar expand="lg" bg="dark" variant="dark">

@@ -139,6 +139,8 @@ const Sidebar: React.FC = () => {
                 </>
               )}
             </ul>
+
+            <br />
           </div>
         </div>
       </div>

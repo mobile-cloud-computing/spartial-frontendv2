@@ -357,9 +357,13 @@ const Fairness: React.FC = () => {
   return (
     <div className="container mt-5">
       {/* <h2 className="mb-4">Fairness Service</h2> */}
-      <Link to={fairnessHomepage} className="nav-link text-lightblue fs-5">
+      <Link to={fairnessHomepage} className="nav-link text-lightblue fs-4">
         Fairness Service
       </Link>
+      <p>
+        To assess whether a model is predicting the desirable outcome equally
+        well for all values of a sensitive attribute.
+      </p>
       <br />
       {error && <div className="alert alert-danger">{error}</div>}
       <FileUpload

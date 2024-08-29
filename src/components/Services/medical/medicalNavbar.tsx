@@ -7,7 +7,7 @@ const medicalHomepage = "/medicalHomepage";
 const MedicalNavbar: React.FC = () => {
   return (
     <>
-      <Link to={medicalHomepage} className="nav-link text-lightblue fs-5">
+      <Link to={medicalHomepage} className="nav-link text-lightblue fs-4 mt-4">
         Medical Analysis Service
       </Link>
       <BootstrapNavbar expand="lg" bg="dark" variant="dark">
@@ -21,39 +21,40 @@ const MedicalNavbar: React.FC = () => {
               title="Emergency Detection"
               id="emergency-dropdown"
             >
-              <NavDropdown.Item href="/DetectMIEmergencies">
+              <Link to="/DetectMIEmergencies" className="dropdown-item">
                 Detect MI Emergencies
-              </NavDropdown.Item>
-              <NavDropdown.Item href="/GenerateExplanations">
+              </Link>
+              <Link to="/GenerateExplanations" className="dropdown-item">
                 Generate Explanations
-              </NavDropdown.Item>
-              <NavDropdown.Item href="/DemoMIEmergency">
+              </Link>
+              <Link to="/DemoMIEmergency" className="dropdown-item">
                 ECG List-Demo
-              </NavDropdown.Item>
-              <NavDropdown.Item href="/DemoMIEmergencyData">
+              </Link>
+              <Link to="/DemoMIEmergencyData" className="dropdown-item">
                 ECG Data-Demo
-              </NavDropdown.Item>
+              </Link>
             </NavDropdown>
+
             <NavDropdown
               className="bg-dark"
               title="Medical Analysis"
               id="medical-dropdown"
             >
-              <NavDropdown.Item href="/VisualizeECG">
+              <Link to="/VisualizeECG" className="dropdown-item">
                 Visualize ECG
-              </NavDropdown.Item>
-              <NavDropdown.Item href="/IdentifySegments">
+              </Link>
+              <Link to="/IdentifySegments" className="dropdown-item">
                 Identify Segments
-              </NavDropdown.Item>
-              <NavDropdown.Item href="/TickImportance">
+              </Link>
+              <Link to="/TickImportance" className="dropdown-item">
                 Tick Importance
-              </NavDropdown.Item>
-              <NavDropdown.Item href="/TimeImportance">
+              </Link>
+              <Link to="/TimeImportance" className="dropdown-item">
                 Time Importance
-              </NavDropdown.Item>
-              <NavDropdown.Item href="/LeadImportance">
+              </Link>
+              <Link to="/LeadImportance" className="dropdown-item">
                 Lead Importance
-              </NavDropdown.Item>
+              </Link>
             </NavDropdown>
 
             <NavDropdown
@@ -61,9 +62,9 @@ const MedicalNavbar: React.FC = () => {
               title="Model Administration & Application"
               id="model-dropdown"
             >
-              <NavDropdown.Item href="/ModelSpecific">
+              <Link to="/ModelSpecific" className="dropdown-item">
                 View a Specific Model
-              </NavDropdown.Item>
+              </Link>
             </NavDropdown>
           </Nav>
         </BootstrapNavbar.Collapse>

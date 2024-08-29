@@ -98,7 +98,7 @@ const PrivacyMicroservicesForm: React.FC<
   return (
     <div className="container mt-5">
       {/* <h2 className="mb-4">Differential Privacy Service</h2> */}
-      <Link to={privacyHomepage} className="nav-link text-lightblue fs-5">
+      <Link to={privacyHomepage} className="nav-link text-lightblue fs-4">
         Differential Privacy Service
       </Link>
       <p>
