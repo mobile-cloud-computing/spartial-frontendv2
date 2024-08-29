@@ -1,13 +1,13 @@
-import React, { useState} from 'react';
+import React, {useState} from 'react';
 import {Tab, Tabs} from 'react-bootstrap';
 import SHAPTab from '../../XAI/SHAPTab';
 import {useParams} from "react-router";
 import AdversarialTab from '../../AdversarialML/AdversarialML';
 import {ILIMEParametersState} from '../../../types/LimeTypes';
 import {LIMETab} from '../../XAI/LimeTab';
-import {ModelListType, TODO} from '../../../types/types';
 import {getLabelsListAppXAI} from '../../util/utility';
 import {useSpatialContext} from '../../../context/context';
+import {TODO} from "../../../types/types";
 
 
 // interface NetworkTrafficTabsProps {
@@ -39,7 +39,7 @@ import {useSpatialContext} from '../../../context/context';
 const NetworkTrafficTab: React.FC<TODO> = ({comparisonState}) => {
 
 
-    const {XAIStatusState, allACModels} = useSpatialContext();
+    const {XAIStatusState} = useSpatialContext();
 
     const initialState: ILIMEParametersState = {
         modelId: "",
@@ -64,29 +64,22 @@ const NetworkTrafficTab: React.FC<TODO> = ({comparisonState}) => {
 
     return (
         <>
-            <Tabs defaultActiveKey="subtab1" className="flex-column">
-                <Tab eventKey="tab1" title="Configure Network Traffic">
-                    <div className="d-flex">
-                        <Tabs defaultActiveKey="subtab1" className="flex-column">
-                            <Tab eventKey="subtab1" title="LIME">
-                                <div className="side-content px-3">
-                                    <LIMETab state={state} updateState={setState}/>
-                                </div>
-                            </Tab>
-                            <Tab eventKey="subtab2" title="SHAP">
-                                <div className="px-3">
-
-                                    <SHAPTab state={state} updateState={setState}/>
-                                </div>
-                            </Tab>
-                            {!comparisonState.selectedModelLeft?.includes('at') && (
-                                <Tab eventKey="subtab3" title="ATTACKS">
-                                    <AdversarialTab state={state}/>
-                                </Tab>
-                            )}
-                        </Tabs>
+            <Tabs className="flex-row">
+                <Tab eventKey="subtab1" title="LIME">
+                    <div className="side-content px-3">
+                        <LIMETab state={state} updateState={setState}/>
                     </div>
                 </Tab>
+                <Tab eventKey="subtab2" title="SHAP">
+                    <div className="px-3">
+                        <SHAPTab state={state} updateState={setState}/>
+                    </div>
+                </Tab>
+                {!comparisonState.selectedModelLeft?.includes('at') && (
+                    <Tab eventKey="subtab3" title="ATTACKS">
+                        <AdversarialTab state={state}/>
+                    </Tab>
+                )}
             </Tabs>
         </>
     )

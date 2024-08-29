@@ -1,6 +1,5 @@
 import React, {useState, FormEvent, useEffect} from 'react';
 import {Container, Form, Row, Col, Button, InputGroup, Card, Spinner} from 'react-bootstrap';
-import PieChartComponent from '../Charts/PieChartComponent';
 import ProbabilityTable from "../Charts/ProbabilityTable";
 import LimeDataUpdater from '../util/LimeDataUpdater';
 import useFetchModelDataset from "../Datasets/useFetchModelDataset";
@@ -11,20 +10,20 @@ import LollipopChart from "../Plots/LolipopChart";
 import {LIMETabProps} from '../../types/LimeTypes';
 import TooltipComponent from '../util/TooltipComponent/TooltipComponentProps';
 
-interface LimeItem {
-    value: number;
-    feature: string | string[];
-}
+// interface LimeItem {
+// //     value: number;
+// //     feature: string | string[];
+// // }
 
 
 export const LIMETab: React.FC<LIMETabProps> = ({state}) => {
     const [newState, setNewState] = useState({...state});
-    const allowedValues = [1, 5, 10, 15, 20, 25, 30];
+    // const allowedValues = [1, 5, 10, 15, 20, 25, 30];
     const [triggerDataUpdate, setTriggerDataUpdate] = useState(false);
     const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
     const [maskedFeatures, setMaskedFeatures] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const {originalDataset, error} = useFetchModelDataset(false, newState.modelId, "train");
+    const {originalDataset, } = useFetchModelDataset(false, newState.modelId, "train");
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const target = event.target;
@@ -63,6 +62,7 @@ export const LIMETab: React.FC<LIMETabProps> = ({state}) => {
 
         const {sampleId, maxDisplay} = newState;
         const LIMEConfig: any = {modelId: newState.modelId, sampleId, maxDisplay};
+        console.log(LIMEConfig)
         setTriggerDataUpdate(true);
         await monitorStatus("LIME", LIMEConfig).catch((e) => console.log(e));
 
@@ -162,8 +162,8 @@ export const LIMETab: React.FC<LIMETabProps> = ({state}) => {
         value: number;
     }) => {
         if (d.value > 0 && newState.positiveChecked) return true;
-        if (d.value < 0 && newState.negativeChecked) return true;
-        return false;
+        return d.value < 0 && newState.negativeChecked;
+
     });
 
     const filteredMaskedValuesLime = Array.isArray(filteredValuesLime) && filteredValuesLime.filter((obj: {
@@ -209,7 +209,7 @@ export const LIMETab: React.FC<LIMETabProps> = ({state}) => {
                                         <Form.Select multiple name="featuresToMask" className="form-select"
                                                      onChange={handleMultiSelectChange} aria-label="Features to Mask">
                                             <option value="%tcp_protocol">%tcp_protocol</option>
-                                            {newState.maskedFeatures.length > 0 && Object.keys(newState.maskedFeatures[0]).sort().map((key, index) => (
+                                            {newState.maskedFeatures.length > 0 && Object.keys(newState.maskedFeatures[0]).sort().map((key) => (
                                                 <option value={key} key={key}>{key}</option>
                                             ))}
                                         </Form.Select>
@@ -291,7 +291,7 @@ export const LIMETab: React.FC<LIMETabProps> = ({state}) => {
     );
 }
 
-export const LimeChartsDisplay = ({state, loading}: any) => (
+export const LimeChartsDisplay = ({state}: any) => (
     <Card>
         <Card.Body>
             <Row>

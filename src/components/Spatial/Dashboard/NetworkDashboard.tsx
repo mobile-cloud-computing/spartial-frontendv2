@@ -189,8 +189,8 @@ const NetworkDashboard: React.FC = () => {
         </Row>
       </Form>
 
-      <Tabs>
-        <Tab eventKey="subtab6" title={"NetworkTrafficTab"}>
+      <Tabs defaultActiveKey="home">
+        <Tab eventKey="subtab6" title={"Configure Network Traffic"}>
           <NetworkTrafficTab
             filtteredModels={filteredModels}
             comparisonState={comparisonState}
