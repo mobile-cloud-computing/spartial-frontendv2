@@ -80,4 +80,4 @@ jobs:
             docker stop flamboyant_swartz || true
             docker rm flamboyant_swartz || true
             # Run the new container
-            docker run -d --name flamboyant_swartz -p 80:80 elemson/spatialclient:latest
+            docker run -d --name flamboyant_swartz -p 3000:3000 elemson/spatialclient:latest
