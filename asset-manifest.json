@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/css/main.d8581beb.css",
-    "main.js": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/js/main.8cc54d37.js",
+    "main.js": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/js/main.5f1de7a2.js",
     "static/media/bootstrap-icons.woff?": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/media/bootstrap-icons.39795c0b4513de014cf8.woff",
     "static/media/bootstrap-icons.woff2?": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/media/bootstrap-icons.b7bcc075b395c14ce8c2.woff2",
     "index.html": "https://mobile-cloud-computing.github.io/spartial-frontendv2/index.html",
     "main.d8581beb.css.map": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/css/main.d8581beb.css.map",
-    "main.8cc54d37.js.map": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/js/main.8cc54d37.js.map"
+    "main.5f1de7a2.js.map": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/js/main.5f1de7a2.js.map"
   },
   "entrypoints": [
     "static/css/main.d8581beb.css",
-    "static/js/main.8cc54d37.js"
+    "static/js/main.5f1de7a2.js"
   ]
 }
