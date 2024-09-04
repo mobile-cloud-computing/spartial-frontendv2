@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/css/main.d8581beb.css",
-    "main.js": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/js/main.f0fe3481.js",
-    "static/media/bootstrap-icons.woff?": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/media/bootstrap-icons.39795c0b4513de014cf8.woff",
-    "static/media/bootstrap-icons.woff2?": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/media/bootstrap-icons.b7bcc075b395c14ce8c2.woff2",
-    "index.html": "https://mobile-cloud-computing.github.io/spartial-frontendv2/index.html",
-    "main.d8581beb.css.map": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/css/main.d8581beb.css.map",
-    "main.f0fe3481.js.map": "https://mobile-cloud-computing.github.io/spartial-frontendv2/static/js/main.f0fe3481.js.map"
+    "main.css": "http://193.40.154.121:3000/spartial-frontendv2/static/css/main.95079d15.css",
+    "main.js": "http://193.40.154.121:3000/spartial-frontendv2/static/js/main.249dc10b.js",
+    "static/media/bootstrap-icons.woff?": "http://193.40.154.121:3000/spartial-frontendv2/static/media/bootstrap-icons.39795c0b4513de014cf8.woff",
+    "static/media/bootstrap-icons.woff2?": "http://193.40.154.121:3000/spartial-frontendv2/static/media/bootstrap-icons.b7bcc075b395c14ce8c2.woff2",
+    "index.html": "http://193.40.154.121:3000/spartial-frontendv2/index.html",
+    "main.95079d15.css.map": "http://193.40.154.121:3000/spartial-frontendv2/static/css/main.95079d15.css.map",
+    "main.249dc10b.js.map": "http://193.40.154.121:3000/spartial-frontendv2/static/js/main.249dc10b.js.map"
   },
   "entrypoints": [
-    "static/css/main.d8581beb.css",
-    "static/js/main.f0fe3481.js"
+    "static/css/main.95079d15.css",
+    "static/js/main.249dc10b.js"
   ]
 }
