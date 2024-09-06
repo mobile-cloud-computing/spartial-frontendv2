@@ -5,20 +5,20 @@
         // Check if the current path is already correct
         var pathname = window.location.pathname;
 
-        // Ensure the pathname does not already start with /spartial-frontendv2
-        if (!pathname.startsWith('/spartial-frontendv2')) {
-            // Clean the path by removing /spartial-frontendv2 if it exists
-            var cleanPath = pathname.replace('/spartial-frontendv2', '');
-            var newUrl = '/spartial-frontendv2' + cleanPath;
-
-            // Ensure the new URL is different before redirecting
-            if (newUrl !== window.location.href) {
-                window.location.href = newUrl;
-            }
-        } else {
-            // Prevent unnecessary redirects
-            console.log('Path is already correct. No redirect needed.');
-        }
+        // // Ensure the pathname does not already start with /spartial-frontendv2
+        // if (!pathname.startsWith('/spartial-frontendv2')) {
+        //     // Clean the path by removing /spartial-frontendv2 if it exists
+        //     var cleanPath = pathname.replace('/spartial-frontendv2', '');
+        //     var newUrl = '/spartial-frontendv2' + cleanPath;
+        //
+        //     // Ensure the new URL is different before redirecting
+        //     if (newUrl !== window.location.href) {
+        //         window.location.href = newUrl;
+        //     }
+        // } else {
+        //     // Prevent unnecessary redirects
+        //     console.log('Path is already correct. No redirect needed.');
+        // }
     </script>
     <title>Not found</title>
 </head>
