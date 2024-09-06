@@ -21,8 +21,8 @@ interface Partner {
 const partners: Partner[] = [
   {
     name: "University of Tartu, Estonia",
-    // logo: "https://spatial-h2020.eu/wp-content/uploads/2021/11/Tartu_Logo_Def.png",
-    logo: "./Tartu_Logo.png",
+    logo: "https://spatial-h2020.eu/wp-content/uploads/2021/11/Tartu_Logo_Def.png",
+    // logo: "./Tartu_Logo.png",
     employees: [
       {
         id: "1",
