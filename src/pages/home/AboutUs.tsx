@@ -601,7 +601,7 @@ const AboutUs: React.FC = () => {
               {employeeOrder.map((employeeId) => {
                 const data = employeeMap.get(employeeId);
                 if (!data) return null;
-                const { employee, partnerName } = data;
+                const { employee, partnerName, partnerLogo } = data;
                 return (
                   <tr key={employeeId}>
                     {/* <td>{index + 1}</td> */}
@@ -611,7 +611,7 @@ const AboutUs: React.FC = () => {
                     <td>{employee.email}</td>
                     <td>
                       <img
-                        src={`${process.env.PUBLIC_URL}/partnerLogo`}
+                        src={`${partnerLogo}`}
                         alt={`${partnerName} logo`}
                         className="partner-logo-small"
                       />
