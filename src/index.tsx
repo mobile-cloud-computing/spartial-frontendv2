@@ -34,7 +34,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
     <React.StrictMode>
-        <BrowserRouter basename="/spartial-frontendv2">
+        <BrowserRouter basename="/">
             <AuthWrapper />
         </BrowserRouter>
     </React.StrictMode>
