@@ -8,6 +8,7 @@ import App from './App';
 import { Provider } from "./context/context";
 
 const oktaAuth = new OktaAuth(oktaConfig);
+console.log(oktaConfig, oktaAuth, "auth settings");
 
 const AuthWrapper = () => {
     const navigate = useNavigate();
