@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, useNavigate } from 'react-router-dom';
-import { OktaAuth, toRelativeUrl } from "@okta/okta-auth-js";
+import { OktaAuth } from "@okta/okta-auth-js";
 import { Security } from "@okta/okta-react";
-import { oktaConfig } from "./config/oktaConfig";
+import { oktaConfig} from "./config/oktaConfig";
 import App from './App';
 import { Provider } from "./context/context";
 
@@ -17,7 +17,7 @@ const AuthWrapper = () => {
     };
 
     const restoreOriginalUri = async (_oktaAuth: any, originalUri: any) => {
-        navigate(toRelativeUrl(originalUri || '/', window.location.origin));
+        window.location.replace(originalUri || window.location.origin);
     };
 
     return (
