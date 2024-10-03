@@ -120,13 +120,13 @@ async function makeApiRequest<T>(
 export default makeApiRequest;
 
 export const requestAllReports = async () => {
-    return makeApiRequest<Option[]>(`${LOCAL_URL}/api/reports`);
+    return makeApiRequest<Option[]>(`${LOCAL_URL}/api/nts/reports`);
 };
 export const requestMMTStatus = async () => {
-    return makeApiRequest<MMTStatusInterface>(`${LOCAL_URL}/api/mmt`);
+    return makeApiRequest<MMTStatusInterface>(`${LOCAL_URL}/nts/api/mmt`);
 };
 export const requestXAIStatus = async () => {
-    return makeApiRequest<any>(`${LOCAL_URL}/api/xai`);
+    return makeApiRequest<any>(`${LOCAL_URL}/api/nts/xai`);
 }
 export const requestBuildADModel = async (
     datasets: DatasetType,
@@ -134,35 +134,35 @@ export const requestBuildADModel = async (
     params: TParamType
 ): Promise<BuildStatusType | null> => {
     const buildConfig = {datasets, "training_ratio": ratio, "training_parameters": params};
-    return makeApiRequest<BuildStatusType>(`${LOCAL_URL}/api/build`, 'post', {buildConfig});
+    return makeApiRequest<BuildStatusType>(`${LOCAL_URL}/api/nts/build`, 'post', {buildConfig});
 };
 
 export const requestDatasetAC = async () => {
-    return makeApiRequest<Ac>(`${LOCAL_URL}/api/ac/datasets`);
+    return makeApiRequest<Ac>(`${LOCAL_URL}/api/nts/ac/datasets`);
 };
 
 export const requestBuildStatusAC = async () => {
-    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/ac/build`);
+    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/ac/build`);
     return response ? response.buildStatus : null;
 };
 
 export const requestBuildACModel = async (modelType: any, dataset: any, featuresList: any, trainingRatio: any) => {
     const buildACConfig = {modelType, dataset, featuresList, trainingRatio};
-    return makeApiRequest<any>(`${LOCAL_URL}/api/ac/build`, 'post', {buildACConfig});
+    return makeApiRequest<any>(`${LOCAL_URL}/api/nts/ac/build`, 'post', {buildACConfig});
 };
 
 export const requestAllModels = async () => {
-    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/models`);
+    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models`);
     return response ? response.models : null;
 }
 
 export const requestModel = async (modelId: string) => {
-    return await makeApiRequest<any>(`${LOCAL_URL}/api/models/${modelId}`);
+    return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models/${modelId}`);
 }
 export const requestDownloadModel = async (modelId: string) => {
 
     try {
-        const response = await makeApiRequest<Blob>(`${LOCAL_URL}/api/models/${modelId}/download`, 'get', null, 'blob');
+        const response = await makeApiRequest<Blob>(`${LOCAL_URL}/api/nts/models/${modelId}/download`, 'get', null, 'blob');
         BlobDownload(response, modelId, null)
 
     } catch (error) {
@@ -182,7 +182,7 @@ export const requestDownloadDatasets = async (modelId: string, datasetType: stri
     }
 
     try {
-        const response = await makeApiRequest<Blob>(`${LOCAL_URL}/api/models/${modelId}/datasets/${datasetType}/download`, 'get', null, 'blob');
+        const response = await makeApiRequest<Blob>(`${LOCAL_URL}/api/nts/models/${modelId}/datasets/${datasetType}/download`, 'get', null, 'blob');
         BlobDownload(response, modelId, datasetType)
     } catch (error) {
         console.error('Error downloading the model:', error);
@@ -218,27 +218,27 @@ const BlobDownload = (response: Blob | null, modelId: any, datasetType: any) => 
 }
 
 export const requestViewModelDatasets = async (modelId: string, datasetType: string) => {
-    return await makeApiRequest<any>(`${LOCAL_URL}/api/models/${modelId}/datasets/${datasetType}/view`, 'get', null);
+    return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models/${modelId}/datasets/${datasetType}/view`, 'get', null);
 }
 export const requestViewPoisonedDatasets = async (modelId: string, selectedAttack: string): Promise<any> => {
     console.log(modelId, selectedAttack)
-    return await makeApiRequest(`${LOCAL_URL}/api/attacks/poisoning/${selectedAttack}/${modelId}/view`, 'get', null)
+    return await makeApiRequest(`${LOCAL_URL}/api/nts/attacks/poisoning/${selectedAttack}/${modelId}/view`, 'get', null)
 }
 
 export const requestLimeValues = async (modelId: string, labelId: number) => {
     const labelsList = getLabelsListXAI(modelId);
     console.log(`Get LIME values of the model ${modelId} for the label ${labelsList[labelId]} from server`);
-    return await makeApiRequest<any>(`${LOCAL_URL}/api/xai/lime/explanations/${modelId}/${labelId}`)
+    return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/xai/lime/explanations/${modelId}/${labelId}`)
 }
 
 export const requestAttackStatus = async () => {
-    const data = await makeApiRequest<any>(`${LOCAL_URL}/api/attacks/`, 'get', null)
+    const data = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/attacks/`, 'get', null)
     console.log(data)
     return data ? data.attacksStatus : null;
 }
 
 export const requestAttacksDatasets = async (modelId: string) => {
-    const data = await makeApiRequest<any>(`${LOCAL_URL}/api/attacks/${modelId}/datasets`, 'get', null)
+    const data = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/attacks/${modelId}/datasets`, 'get', null)
     return data ? data.datasets : null;
 }
 
@@ -260,7 +260,7 @@ export const requestPerformAttack = async (formData: TODO) => {
         const randomSwappingLabelsConfig = {
             "poisoningAttacksConfig": poisoningAttacksConfig,
         };
-        const res = await makeApiRequest<any>(`${LOCAL_URL}/api/attacks/poisoning/random-swapping-labels`, 'post', {randomSwappingLabelsConfig})
+        const res = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/attacks/poisoning/random-swapping-labels`, 'post', {randomSwappingLabelsConfig})
         console.log(res, "resssssss")
         return res
     } else if (attackType === "tlf") {
@@ -269,13 +269,13 @@ export const requestPerformAttack = async (formData: TODO) => {
             "targetClass": targetClass,
         };
 
-        return await makeApiRequest<any>(`${LOCAL_URL}/api/attacks/poisoning/target-label-flipping`, 'post', {targetLabelFlippingConfig})
+        return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/attacks/poisoning/target-label-flipping`, 'post', {targetLabelFlippingConfig})
     } else if (attackType === "ctgan") {
         const ctganConfig = {
             "poisoningAttacksConfig": poisoningAttacksConfig,
         };
 
-        return await makeApiRequest<any>(`${LOCAL_URL}/api/attacks/ctgan`, 'post', {ctganConfig})
+        return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/attacks/ctgan`, 'post', {ctganConfig})
     } else {
         console.error("Wrong attack!")
     }
@@ -285,7 +285,7 @@ export const requestPerformAttack = async (formData: TODO) => {
 
 export const requestPredictionsModel = async (modelId: string) => {
     console.log(modelId)
-    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/models/${modelId}/predictions`);
+    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models/${modelId}/predictions`);
     console.log(response)
     return response.predictions
 }
@@ -299,15 +299,15 @@ export const requestRunLime = async (modelId: string, sampleId: number | string[
 
     console.log(limeConfig)
 
-    return await makeApiRequest<any>(`${LOCAL_URL}/api/xai/lime`, 'post', {limeConfig});
+    return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/xai/lime`, 'post', {limeConfig});
 }
 
 export const requestPredictedProbsModel = async (modelId: string) => {
-    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/models/${modelId}/probabilities`);
+    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models/${modelId}/probabilities`);
     return response.probs
 }
 export const requestBuildConfigModel = async (modelId: string) => {
-    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/models/${modelId}/build-config`);
+    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models/${modelId}/build-config`);
     console.log(response)
     return response.buildConfig
 }
@@ -324,7 +324,7 @@ export const differentialPrivacy = async (formData: FormState) => {
     return await makeApiRequest<any>(`${SERVER_URL}/api/v3/differential_privacy/execute`, 'post', formData);
 }
 
-//medical 
+//medical
 
 export const MIEmergencyModels = async (modelFile: File) => {
     try {
@@ -504,7 +504,7 @@ export const GradientSHAP_TICK_Visualize = async (dat: string, hea: string, mode
         };
 
 
-       return  await makeApiRequest<any>(url, 'post', requestBody, 'blob');
+        return  await makeApiRequest<any>(url, 'post', requestBody, 'blob');
 
 
     } catch (error) {
@@ -564,7 +564,7 @@ export const GradientSHAP_TIME_Visualize = async (dat: string, hea: string, mode
         };
 
 
-       return await makeApiRequest<any>(url, 'post', requestBody, 'blob');
+        return await makeApiRequest<any>(url, 'post', requestBody, 'blob');
 
 
     } catch (error) {
@@ -718,7 +718,7 @@ export const tickImportance = async (dat: string, hea: string, xai_method: strin
             dat: dat,
             hea: hea
         };
-    return  await makeApiRequest<any>(
+        return  await makeApiRequest<any>(
             `${SERVER_URL}/medical_analysis/ecg_analysis/explain/${xai_method}/tick_importance?model_id=${model_id}`,
             'post',
             requestBody,
@@ -1003,7 +1003,7 @@ const readFileAsBlob = (file: File): Promise<Blob> => {
 };
 export const requestRunShap = async (modelId: string, numberBackgroundSamples: number, numberExplainedSamples: number, maxDisplay: number) => {
 
-    const url = `${LOCAL_URL}/api/xai/shap`;
+    const url = `${LOCAL_URL}/api/nts/xai/shap`;
     const shapConfig = {
         "modelId": modelId,
         "numberBackgroundSamples": numberBackgroundSamples,
@@ -1017,13 +1017,13 @@ export const requestRunShap = async (modelId: string, numberBackgroundSamples: n
 
 export const fetchSHAPValues = async (modelId: string, labelIndex: number) => {
     const labelsList = getLabelsListXAI(modelId);
-    const url = `${LOCAL_URL}/api/xai/shap/explanations/${modelId}/${labelIndex}`
+    const url = `${LOCAL_URL}/api/nts/xai/shap/explanations/${modelId}/${labelIndex}`
     return await makeApiRequest(url, 'get', {labelsList});
 }
 
 export const requestRetrainModelAC = async (modelId: string, trainingDataset: string, testingDataset: string, modelType: TODO) => {
 
-    const url = `${LOCAL_URL}/api/ac/retrain`;
+    const url = `${LOCAL_URL}/api/nts/ac/retrain`;
     const retrainACConfig = {
         "modelId": modelId,
         "modelType": modelType,
@@ -1039,11 +1039,11 @@ export const requestRetrainModelAC = async (modelId: string, trainingDataset: st
 }
 
 export const requestRetrainStatusAC = async () => {
-    return await makeApiRequest(`${LOCAL_URL}/api/ac/retrain`);
+    return await makeApiRequest(`${LOCAL_URL}/api/nts/ac/retrain`);
 }
 
 export const requestRetrainModel = async (modelId: string, trainingDataset: string, testingDataset: string, params: any) => {
-    const url = `${LOCAL_URL}/api/retrain/${modelId}`;
+    const url = `${LOCAL_URL}/api/nts/retrain/${modelId}`;
     const retrainADConfig = {
         "trainingDataset": trainingDataset,
         "testingDataset": testingDataset,
@@ -1055,7 +1055,7 @@ export const requestRetrainModel = async (modelId: string, trainingDataset: stri
 }
 
 export const deleteModel = async (modelId: string) => {
-    const url = `${LOCAL_URL}/api/models/${modelId}`;
+    const url = `${LOCAL_URL}/api/nts/models/${modelId}`;
     const response = await makeApiRequest<{ result: string }>(url, 'delete');
 
     if (response) {
@@ -1093,7 +1093,7 @@ export const PostWithSecureModels = async (file: File, name: string, version: st
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            new Error(`HTTP error! status: ${response.status}`);
         }
 
         return await response.json();
@@ -1120,7 +1120,7 @@ export const requestWithSecureData = async (): Promise<DataItem[]> => {
     try {
         const response = await fetch(`${SERVER_URL}/data`);
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            new Error(`HTTP error! status: ${response.status}`);
         }
         return await response.json();
     } catch (error) {
@@ -1142,7 +1142,7 @@ export const PostWithSecureData = async (file: File, classname: string) => {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            new Error(`HTTP error! status: ${response.status}`);
         }
 
         return await response.json();
@@ -1177,6 +1177,3 @@ export const requestWithSecureSingleAttackStatus = async (id: string) => {
         console.error('Error calling API:', error);
     }
 }
-
-
-
