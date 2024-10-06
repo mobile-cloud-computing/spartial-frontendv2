@@ -28,7 +28,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$VM_IP "
             # Navigate to the app directory on the VM
-            cd /spartial-frontendv2 || exit 1
+            cd ~/spartial-frontendv2 || exit 1
 
             # Pull the latest changes
             git pull origin master
