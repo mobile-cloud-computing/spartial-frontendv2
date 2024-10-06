@@ -1,0 +1,3 @@
+target_host: "web"
+repo_url: "https://github.com/mobile-cloud-computing/spartial-frontendv2.git"
+app_directory: "~/spartial-frontendv2"
