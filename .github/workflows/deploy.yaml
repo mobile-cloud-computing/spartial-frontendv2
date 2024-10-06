@@ -28,16 +28,33 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$VM_IP "
             # Navigate to the app directory on the VM
-            cd ~/spartial-frontendv2 || exit 1
+            cd /spartial-frontendv2 || exit 1
 
             # Pull the latest changes
             git pull origin master
 
+            # Install Docker Compose if not already installed
+            if ! command -v docker-compose &> /dev/null; then
+              sudo curl -L 'https://github.com/docker/compose/releases/download/v2.1.1/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+
+            # Install Node.js and npm if not installed
+            if ! command -v npm &> /dev/null; then
+              curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
+
+            # Install PM2 globally if not installed
+            if ! command -v pm2 &> /dev/null; then
+              sudo npm install -g pm2
+            fi
+
             # If using Docker, rebuild and restart the container
-            sudo docker compose down
-            sudo docker compose up -d --build
+            sudo docker-compose down
+            sudo docker-compose up -d --build
 
             # Or, if not using Docker, build and restart the application
             sudo npm install
-            pm2 restart app_name
+            pm2 restart spartial-app
           "
