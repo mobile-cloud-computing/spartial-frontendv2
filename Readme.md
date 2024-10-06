@@ -129,11 +129,11 @@ Before you begin, ensure you have the following installed on your local machine:
    docker run -p 3000:3000 --env-file .env spatial-frontendv2
    ```
 
-     tasks:
-       - name: Update and upgrade apt packages
-         apt:
-           update_cache: yes
-           upgrade: yes
+   tasks:
+   - name: Update and upgrade apt packages
+   apt:
+   update_cache: yes
+   upgrade: yes
 
        - name: Install required packages
          apt:
