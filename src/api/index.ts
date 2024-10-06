@@ -1,5 +1,5 @@
 import axios, {AxiosResponse} from "axios";
-import {LOCAL_URL, SERVER_URL} from "../constants";
+import {URL} from "../constants";
 import {
     DatasetType,
     TParamType,
@@ -117,16 +117,14 @@ async function makeApiRequest<T>(
     }
 }
 
-export default makeApiRequest;
-
 export const requestAllReports = async () => {
-    return makeApiRequest<Option[]>(`${LOCAL_URL}/api/nts/reports`);
+    return makeApiRequest<Option[]>(`${URL}/api/nts/reports`);
 };
 export const requestMMTStatus = async () => {
-    return makeApiRequest<MMTStatusInterface>(`${LOCAL_URL}/nts/api/mmt`);
+    return makeApiRequest<MMTStatusInterface>(`${URL}/api/nts/mmt`);
 };
 export const requestXAIStatus = async () => {
-    return makeApiRequest<any>(`${LOCAL_URL}/api/nts/xai`);
+    return makeApiRequest<any>(`${URL}/api/nts/xai`);
 }
 export const requestBuildADModel = async (
     datasets: DatasetType,
@@ -134,35 +132,35 @@ export const requestBuildADModel = async (
     params: TParamType
 ): Promise<BuildStatusType | null> => {
     const buildConfig = {datasets, "training_ratio": ratio, "training_parameters": params};
-    return makeApiRequest<BuildStatusType>(`${LOCAL_URL}/api/nts/build`, 'post', {buildConfig});
+    return makeApiRequest<BuildStatusType>(`${URL}/api/nts/build`, 'post', {buildConfig});
 };
 
 export const requestDatasetAC = async () => {
-    return makeApiRequest<Ac>(`${LOCAL_URL}/api/nts/ac/datasets`);
+    return makeApiRequest<Ac>(`${URL}/api/nts/ac/datasets`);
 };
 
 export const requestBuildStatusAC = async () => {
-    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/ac/build`);
+    const response = await makeApiRequest<any>(`${URL}/api/nts/ac/build`);
     return response ? response.buildStatus : null;
 };
 
 export const requestBuildACModel = async (modelType: any, dataset: any, featuresList: any, trainingRatio: any) => {
     const buildACConfig = {modelType, dataset, featuresList, trainingRatio};
-    return makeApiRequest<any>(`${LOCAL_URL}/api/nts/ac/build`, 'post', {buildACConfig});
+    return makeApiRequest<any>(`${URL}/api/nts/ac/build`, 'post', {buildACConfig});
 };
 
 export const requestAllModels = async () => {
-    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models`);
+    const response = await makeApiRequest<any>(`${URL}/api/nts/models`);
     return response ? response.models : null;
 }
 
 export const requestModel = async (modelId: string) => {
-    return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models/${modelId}`);
+    return await makeApiRequest<any>(`${URL}/api/nts/models/${modelId}`);
 }
 export const requestDownloadModel = async (modelId: string) => {
 
     try {
-        const response = await makeApiRequest<Blob>(`${LOCAL_URL}/api/nts/models/${modelId}/download`, 'get', null, 'blob');
+        const response = await makeApiRequest<Blob>(`${URL}/api/nts/models/${modelId}/download`, 'get', null, 'blob');
         BlobDownload(response, modelId, null)
 
     } catch (error) {
@@ -182,7 +180,7 @@ export const requestDownloadDatasets = async (modelId: string, datasetType: stri
     }
 
     try {
-        const response = await makeApiRequest<Blob>(`${LOCAL_URL}/api/nts/models/${modelId}/datasets/${datasetType}/download`, 'get', null, 'blob');
+        const response = await makeApiRequest<Blob>(`${URL}/api/nts/models/${modelId}/datasets/${datasetType}/download`, 'get', null, 'blob');
         BlobDownload(response, modelId, datasetType)
     } catch (error) {
         console.error('Error downloading the model:', error);
@@ -218,27 +216,27 @@ const BlobDownload = (response: Blob | null, modelId: any, datasetType: any) => 
 }
 
 export const requestViewModelDatasets = async (modelId: string, datasetType: string) => {
-    return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models/${modelId}/datasets/${datasetType}/view`, 'get', null);
+    return await makeApiRequest<any>(`${URL}/api/nts/models/${modelId}/datasets/${datasetType}/view`, 'get', null);
 }
 export const requestViewPoisonedDatasets = async (modelId: string, selectedAttack: string): Promise<any> => {
     console.log(modelId, selectedAttack)
-    return await makeApiRequest(`${LOCAL_URL}/api/nts/attacks/poisoning/${selectedAttack}/${modelId}/view`, 'get', null)
+    return await makeApiRequest(`${URL}/api/nts/attacks/poisoning/${selectedAttack}/${modelId}/view`, 'get', null)
 }
 
 export const requestLimeValues = async (modelId: string, labelId: number) => {
     const labelsList = getLabelsListXAI(modelId);
     console.log(`Get LIME values of the model ${modelId} for the label ${labelsList[labelId]} from server`);
-    return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/xai/lime/explanations/${modelId}/${labelId}`)
+    return await makeApiRequest<any>(`${URL}/api/nts/xai/lime/explanations/${modelId}/${labelId}`)
 }
 
 export const requestAttackStatus = async () => {
-    const data = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/attacks/`, 'get', null)
+    const data = await makeApiRequest<any>(`${URL}/api/nts/attacks/`, 'get', null)
     console.log(data)
     return data ? data.attacksStatus : null;
 }
 
 export const requestAttacksDatasets = async (modelId: string) => {
-    const data = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/attacks/${modelId}/datasets`, 'get', null)
+    const data = await makeApiRequest<any>(`${URL}/api/nts/attacks/${modelId}/datasets`, 'get', null)
     return data ? data.datasets : null;
 }
 
@@ -260,7 +258,7 @@ export const requestPerformAttack = async (formData: TODO) => {
         const randomSwappingLabelsConfig = {
             "poisoningAttacksConfig": poisoningAttacksConfig,
         };
-        const res = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/attacks/poisoning/random-swapping-labels`, 'post', {randomSwappingLabelsConfig})
+        const res = await makeApiRequest<any>(`${URL}/api/nts/attacks/poisoning/random-swapping-labels`, 'post', {randomSwappingLabelsConfig})
         console.log(res, "resssssss")
         return res
     } else if (attackType === "tlf") {
@@ -269,13 +267,13 @@ export const requestPerformAttack = async (formData: TODO) => {
             "targetClass": targetClass,
         };
 
-        return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/attacks/poisoning/target-label-flipping`, 'post', {targetLabelFlippingConfig})
+        return await makeApiRequest<any>(`${URL}/api/nts/attacks/poisoning/target-label-flipping`, 'post', {targetLabelFlippingConfig})
     } else if (attackType === "ctgan") {
         const ctganConfig = {
             "poisoningAttacksConfig": poisoningAttacksConfig,
         };
 
-        return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/attacks/ctgan`, 'post', {ctganConfig})
+        return await makeApiRequest<any>(`${URL}/api/nts/attacks/ctgan`, 'post', {ctganConfig})
     } else {
         console.error("Wrong attack!")
     }
@@ -285,7 +283,7 @@ export const requestPerformAttack = async (formData: TODO) => {
 
 export const requestPredictionsModel = async (modelId: string) => {
     console.log(modelId)
-    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models/${modelId}/predictions`);
+    const response = await makeApiRequest<any>(`${URL}/api/nts/models/${modelId}/predictions`);
     console.log(response)
     return response.predictions
 }
@@ -299,29 +297,29 @@ export const requestRunLime = async (modelId: string, sampleId: number | string[
 
     console.log(limeConfig)
 
-    return await makeApiRequest<any>(`${LOCAL_URL}/api/nts/xai/lime`, 'post', {limeConfig});
+    return await makeApiRequest<any>(`${URL}/api/nts/xai/lime`, 'post', {limeConfig});
 }
 
 export const requestPredictedProbsModel = async (modelId: string) => {
-    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models/${modelId}/probabilities`);
+    const response = await makeApiRequest<any>(`${URL}/api/nts/models/${modelId}/probabilities`);
     return response.probs
 }
 export const requestBuildConfigModel = async (modelId: string) => {
-    const response = await makeApiRequest<any>(`${LOCAL_URL}/api/nts/models/${modelId}/build-config`);
+    const response = await makeApiRequest<any>(`${URL}/api/nts/models/${modelId}/build-config`);
     console.log(response)
     return response.buildConfig
 }
 
 export const enhancedInterpretability = async (file: FormData) => {
-    return await makeApiRequest<any>(`${SERVER_URL}/enhanced/interpretability/explain`, 'post', file, 'blob');
+    return await makeApiRequest<any>(`${URL}/enhanced/interpretability/explain`, 'post', file, 'blob');
 }
 
 export const fairnessAPI = async (file: FormData) => {
-    return await makeApiRequest<any>(`${SERVER_URL}/explain_fairness/file`, 'post', file, 'blob');
+    return await makeApiRequest<any>(`${URL}/explain_fairness/file`, 'post', file, 'blob');
 }
 
 export const differentialPrivacy = async (formData: FormState) => {
-    return await makeApiRequest<any>(`${SERVER_URL}/api/v3/differential_privacy/execute`, 'post', formData);
+    return await makeApiRequest<any>(`${URL}/api/v3/differential_privacy/execute`, 'post', formData);
 }
 
 //medical
@@ -332,7 +330,7 @@ export const MIEmergencyModels = async (modelFile: File) => {
         formData.append('model_file', modelFile);
 
         return await makeApiRequest<any>(
-            `${SERVER_URL}/model/`,
+            `${URL}/model/`,
             'post',
             formData,
             'json'
@@ -349,7 +347,7 @@ export const MIEmergencyModels = async (modelFile: File) => {
 //     return await makeApiRequest<any>(`/model/`);
 // }
 export const requestMedicalModels = async (): Promise<MedicalModel[]> => {
-    const response = await makeApiRequest<any[]>(`${SERVER_URL}/model/?limit=10000`);
+    const response = await makeApiRequest<any[]>(`${URL}/model/?limit=10000`);
     if (!response) {
         throw new Error('Failed to fetch medical models');
     }
@@ -357,7 +355,7 @@ export const requestMedicalModels = async (): Promise<MedicalModel[]> => {
 };
 
 export const deleteMedicalModel = async (modelId: string) => {
-    const url = `${SERVER_URL}/model/${modelId}`;
+    const url = `${URL}/model/${modelId}`;
     console.log(`Making DELETE request to ${url}`);
     try {
         const response = await makeApiRequest<{ result: string }>(url, 'delete');
@@ -371,16 +369,16 @@ export const deleteMedicalModel = async (modelId: string) => {
     }
 };
 export const demoMIEmergency = async (limit: number) => {
-    return await makeApiRequest<any>(`${SERVER_URL}/emergency_detection/mi_detection/emergency_data?limit=${limit}`);
+    return await makeApiRequest<any>(`${URL}/emergency_detection/mi_detection/emergency_data?limit=${limit}`);
 }
 
 export const demoMIEmergencyData = async (data_id: string) => {
-    return await makeApiRequest<any>(`${SERVER_URL}/emergency_detection/mi_detection/emergency_data/${data_id}`);
+    return await makeApiRequest<any>(`${URL}/emergency_detection/mi_detection/emergency_data/${data_id}`);
 }
 
 export const predictMIEmergencies = async (dat: string, hea: string, store_data: string) => {
     try {
-        let apiUrl = `${SERVER_URL}/emergency_detection/mi_detection/predict`;
+        let apiUrl = `${URL}/emergency_detection/mi_detection/predict`;
 
         const requestBody = {
             dat: dat,
@@ -409,7 +407,7 @@ export const detectMIEmergencies = async (dat: string, hea: string) => {
         };
 
         return await makeApiRequest<any>(
-            `${SERVER_URL}/emergency_detection/mi_detection/explain`,
+            `${URL}/emergency_detection/mi_detection/explain`,
             'post',
             requestBody,
             'blob'
@@ -426,34 +424,34 @@ export const detectMIEmergencies = async (dat: string, hea: string) => {
 // }
 
 export const descriptionECGSignal = async (user_role: string, with_segments: string) => {
-    const url = `${SERVER_URL}/user_support/descriptions/ecg?user_role=${user_role}&with_segments=${with_segments}`;
+    const url = `${URL}/user_support/descriptions/ecg?user_role=${user_role}&with_segments=${with_segments}`;
     return await makeApiRequest<any>(url);
 }
 
 export const descriptionTickImportance = async (xai_visualization_approach: string, user_role: string) => {
-    const url = `${SERVER_URL}/user_support/descriptions/xai_visualization_approaches/tickImportance?user_role=${user_role}`;
+    const url = `${URL}/user_support/descriptions/xai_visualization_approaches/tickImportance?user_role=${user_role}`;
     return await makeApiRequest<any>(url);
 }
 
 export const descriptionTimeImportance = async (xai_visualization_approach: string, user_role: string) => {
-    const url = `${SERVER_URL}/user_support/descriptions/xai_visualization_approaches/timeSegmentImportance?user_role=${user_role}`;
+    const url = `${URL}/user_support/descriptions/xai_visualization_approaches/timeSegmentImportance?user_role=${user_role}`;
     return await makeApiRequest<any>(url);
 }
 
 export const descriptionLeadImportance = async (xai_visualization_approach: string, user_role: string) => {
-    const url = `${SERVER_URL}/user_support/descriptions/xai_visualization_approaches/channelImportance?user_role=${user_role}`;
+    const url = `${URL}/user_support/descriptions/xai_visualization_approaches/channelImportance?user_role=${user_role}`;
     return await makeApiRequest<any>(url);
 }
 
 
 export const descriptionECGClassification = async (user_role: string) => {
-    const url = `${SERVER_URL}/user_support/descriptions/classification_prediction?user_role=${user_role}`;
+    const url = `${URL}/user_support/descriptions/classification_prediction?user_role=${user_role}`;
     return await makeApiRequest<any>(url);
 }
 
 export const MI_ModelPrediction = async (dat: string, hea: string, model_id: string) => {
     try {
-        const url = `${SERVER_URL}/model/${model_id}/predict`;
+        const url = `${URL}/model/${model_id}/predict`;
 
         const requestBody = {
             dat: dat,
@@ -470,14 +468,14 @@ export const MI_ModelPrediction = async (dat: string, hea: string, model_id: str
     }
 }
 export const MI_ModelEvaluate = async (model_id: string, dataset: string) => {
-    const url = `${SERVER_URL}/model/${model_id}/evaluate?dataset=${dataset}`;
+    const url = `${URL}/model/${model_id}/evaluate?dataset=${dataset}`;
     return await makeApiRequest<any>(url);
 }
 
 //Tick Importance
 export const LRP_TICK_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/LRP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${URL}/medical_analysis/ecg_analysis/explain/LRP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -496,7 +494,7 @@ export const LRP_TICK_Visualize = async (dat: string, hea: string, model_id: str
 
 export const GradientSHAP_TICK_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/GradientSHAP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${URL}/medical_analysis/ecg_analysis/explain/GradientSHAP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -516,7 +514,7 @@ export const GradientSHAP_TICK_Visualize = async (dat: string, hea: string, mode
 
 export const DeepSHAP_TICK_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/DeepSHAP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${URL}/medical_analysis/ecg_analysis/explain/DeepSHAP/tick_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -537,7 +535,7 @@ export const DeepSHAP_TICK_Visualize = async (dat: string, hea: string, model_id
 export const LRP_TIME_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
 
-        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/LRP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${URL}/medical_analysis/ecg_analysis/explain/LRP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -556,7 +554,7 @@ export const LRP_TIME_Visualize = async (dat: string, hea: string, model_id: str
 
 export const GradientSHAP_TIME_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/GradientSHAP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${URL}/medical_analysis/ecg_analysis/explain/GradientSHAP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -576,7 +574,7 @@ export const GradientSHAP_TIME_Visualize = async (dat: string, hea: string, mode
 
 export const DeepSHAP_TIME_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/DeepSHAP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${URL}/medical_analysis/ecg_analysis/explain/DeepSHAP/time_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -596,7 +594,7 @@ export const DeepSHAP_TIME_Visualize = async (dat: string, hea: string, model_id
 //Lead Importance
 export const LRP_LEAD_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/LRP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${URL}/medical_analysis/ecg_analysis/explain/LRP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -614,7 +612,7 @@ export const LRP_LEAD_Visualize = async (dat: string, hea: string, model_id: str
 
 export const GradientSHAP_LEAD_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/GradientSHAP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${URL}/medical_analysis/ecg_analysis/explain/GradientSHAP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -631,7 +629,7 @@ export const GradientSHAP_LEAD_Visualize = async (dat: string, hea: string, mode
 
 export const DeepSHAP_LEAD_Visualize = async (dat: string, hea: string, model_id: string, ignore_cached_relevances: string) => {
     try {
-        const url = `${SERVER_URL}/medical_analysis/ecg_analysis/explain/DeepSHAP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${URL}/medical_analysis/ecg_analysis/explain/DeepSHAP/lead_importance?model_id=${model_id}&ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -652,7 +650,7 @@ export const DeepSHAP_LEAD_Visualize = async (dat: string, hea: string, model_id
 export const visualizeECG = async (dat: string, hea: string, cut_classification_window: string) => {
     try {
 
-        let apiUrl = `${SERVER_URL}/medical_analysis/ecg_analysis/visualize_ecg`;
+        let apiUrl = `${URL}/medical_analysis/ecg_analysis/visualize_ecg`;
 
         const requestBody = {
             dat: dat,
@@ -675,7 +673,7 @@ export const visualizeECG = async (dat: string, hea: string, cut_classification_
 
 export const MIModelExplanation = async (dat: string, hea: string, model_id: string, xai_method: string, ignore_cached_relevances: string) => {
     try {
-        const url = `${SERVER_URL}/model/${model_id}/explain/${xai_method}?ignore_cached_relevances=${ignore_cached_relevances}`;
+        const url = `${URL}/model/${model_id}/explain/${xai_method}?ignore_cached_relevances=${ignore_cached_relevances}`;
 
         const requestBody = {
             dat: dat,
@@ -700,7 +698,7 @@ export const identifySegments = async (dat: string, hea: string) => {
         };
 
         return await makeApiRequest<any>(
-            `${SERVER_URL}/medical_analysis/ecg_analysis/identify_segments`,
+            `${URL}/medical_analysis/ecg_analysis/identify_segments`,
             'post',
             requestBody,
             'blob'
@@ -719,7 +717,7 @@ export const tickImportance = async (dat: string, hea: string, xai_method: strin
             hea: hea
         };
         return  await makeApiRequest<any>(
-            `${SERVER_URL}/medical_analysis/ecg_analysis/explain/${xai_method}/tick_importance?model_id=${model_id}`,
+            `${URL}/medical_analysis/ecg_analysis/explain/${xai_method}/tick_importance?model_id=${model_id}`,
             'post',
             requestBody,
             'blob'
@@ -740,7 +738,7 @@ export const timeImportance = async (dat: string, hea: string, xai_method: strin
         };
 
         return await makeApiRequest<any>(
-            `${SERVER_URL}/medical_analysis/ecg_analysis/explain/${xai_method}/time_importance?model_id=${model_id}`,
+            `${URL}/medical_analysis/ecg_analysis/explain/${xai_method}/time_importance?model_id=${model_id}`,
             'post',
             requestBody,
             'blob'
@@ -761,7 +759,7 @@ export const leadImportance = async (dat: string, hea: string, xai_method: strin
         };
 
         return await makeApiRequest<any>(
-            `${SERVER_URL}/medical_analysis/ecg_analysis/explain/${xai_method}/lead_importance?model_id=${model_id}`,
+            `${URL}/medical_analysis/ecg_analysis/explain/${xai_method}/lead_importance?model_id=${model_id}`,
             'post',
             requestBody,
             'blob'
@@ -774,14 +772,14 @@ export const leadImportance = async (dat: string, hea: string, xai_method: strin
 }
 
 export const getSpecificModel = async (model_id: string) => {
-    return await makeApiRequest<any>(`${SERVER_URL}/model/${model_id}`);
+    return await makeApiRequest<any>(`${URL}/model/${model_id}`);
 }
 
 //Llama Service
 
 export const Llama_Service = async (user: string, content: string) => {
     try {
-        const url = `${SERVER_URL}/llama/change-text`;
+        const url = `${URL}/llama/change-text`;
 
         const requestBody = {
             user: user,
@@ -809,7 +807,7 @@ export const clf_accuracy_metric = async (ground_truth: number[], predictions: n
         };
 
         return await makeApiRequest<any>(
-            `${SERVER_URL}/clf_accuracy_metric`,
+            `${URL}/clf_accuracy_metric`,
             'post',
             requestBody,
             'json'
@@ -830,7 +828,7 @@ export const evasion_impact_metric = async (ground_truth: number[], predictions:
         };
 
         return await makeApiRequest<any>(
-            `${SERVER_URL}/evasion_impact_metric`,
+            `${URL}/evasion_impact_metric`,
             'post',
             requestBody,
             'json'
@@ -851,7 +849,7 @@ interface ContributionDict {
 export const consistencyMetricAPI = async (data: { contribution_dict: ContributionDict }): Promise<any> => {
     try {
         const response = await makeApiRequest<any>(
-            `${SERVER_URL}/consistency_metric`,
+            `${URL}/consistency_metric`,
             'post',
             data, // Pass the entire data object directly
             'json'
@@ -867,7 +865,7 @@ export const consistencyMetricAPI = async (data: { contribution_dict: Contributi
 export const consistencyMetricAPIPlot = async (data: { contribution_dict: ContributionDict }): Promise<any> => {
     try {
         const response = await makeApiRequest<any>(
-            `${SERVER_URL}/consistency_metric_plot`,
+            `${URL}/consistency_metric_plot`,
             'post',
             data, // Pass the entire data object directly
             'blob'
@@ -897,7 +895,7 @@ export const compacityMetricAPI = async (data: {
     try {
 
         const response = await makeApiRequest<any>(
-            `${SERVER_URL}/compacity_metric`,
+            `${URL}/compacity_metric`,
             'post',
             data,
             'json'
@@ -919,7 +917,7 @@ export const compacityMetricAPIPlot = async (data: {
 }): Promise<any> => {
     try {
         const response = await makeApiRequest<any>(
-            `${SERVER_URL}/compacity_metric_plot`,
+            `${URL}/compacity_metric_plot`,
             'post',
             data, // Pass the entire data object directly
             'blob'
@@ -953,21 +951,21 @@ export const xaiAPI = async (xai_method: string, image: File, mlModel: File, ima
 
         if (xai_method == 'lime') {
             return await makeApiRequest<any>(
-                `${SERVER_URL}/explain_lime/image?imagetype=${imagetype}`,
+                `${URL}/explain_lime/image?imagetype=${imagetype}`,
                 'post',
                 requestBody,
                 'json'
             );
         } else if (xai_method == 'shap') {
             return await makeApiRequest<any>(
-                `${SERVER_URL}/explain_shap/image?imagetype=${imagetype}`,
+                `${URL}/explain_shap/image?imagetype=${imagetype}`,
                 'post',
                 requestBody,
                 'json'
             );
         } else if (xai_method == 'occ') {
             return await makeApiRequest<any>(
-                `${SERVER_URL}/explain_occlusion/image?imagetype=${imagetype}`,
+                `${URL}/explain_occlusion/image?imagetype=${imagetype}`,
                 'post',
                 requestBody,
                 'json'
@@ -1003,7 +1001,7 @@ const readFileAsBlob = (file: File): Promise<Blob> => {
 };
 export const requestRunShap = async (modelId: string, numberBackgroundSamples: number, numberExplainedSamples: number, maxDisplay: number) => {
 
-    const url = `${LOCAL_URL}/api/nts/xai/shap`;
+    const url = `${URL}/api/nts/xai/shap`;
     const shapConfig = {
         "modelId": modelId,
         "numberBackgroundSamples": numberBackgroundSamples,
@@ -1017,13 +1015,13 @@ export const requestRunShap = async (modelId: string, numberBackgroundSamples: n
 
 export const fetchSHAPValues = async (modelId: string, labelIndex: number) => {
     const labelsList = getLabelsListXAI(modelId);
-    const url = `${LOCAL_URL}/api/nts/xai/shap/explanations/${modelId}/${labelIndex}`
+    const url = `${URL}/api/nts/xai/shap/explanations/${modelId}/${labelIndex}`
     return await makeApiRequest(url, 'get', {labelsList});
 }
 
 export const requestRetrainModelAC = async (modelId: string, trainingDataset: string, testingDataset: string, modelType: TODO) => {
 
-    const url = `${LOCAL_URL}/api/nts/ac/retrain`;
+    const url = `${URL}/api/nts/ac/retrain`;
     const retrainACConfig = {
         "modelId": modelId,
         "modelType": modelType,
@@ -1039,11 +1037,11 @@ export const requestRetrainModelAC = async (modelId: string, trainingDataset: st
 }
 
 export const requestRetrainStatusAC = async () => {
-    return await makeApiRequest(`${LOCAL_URL}/api/nts/ac/retrain`);
+    return await makeApiRequest(`${URL}/api/nts/ac/retrain`);
 }
 
 export const requestRetrainModel = async (modelId: string, trainingDataset: string, testingDataset: string, params: any) => {
-    const url = `${LOCAL_URL}/api/nts/retrain/${modelId}`;
+    const url = `${URL}/api/nts/retrain/${modelId}`;
     const retrainADConfig = {
         "trainingDataset": trainingDataset,
         "testingDataset": testingDataset,
@@ -1055,7 +1053,7 @@ export const requestRetrainModel = async (modelId: string, trainingDataset: stri
 }
 
 export const deleteModel = async (modelId: string) => {
-    const url = `${LOCAL_URL}/api/nts/models/${modelId}`;
+    const url = `${URL}/api/nts/models/${modelId}`;
     const response = await makeApiRequest<{ result: string }>(url, 'delete');
 
     if (response) {
@@ -1069,7 +1067,7 @@ export const deleteModel = async (modelId: string) => {
 //WithSecure
 
 export const requestWithSecureModels = async (): Promise<WithSecureModel[]> => {
-    const response = await makeApiRequest<any[]>(`${SERVER_URL}/models`);
+    const response = await makeApiRequest<any[]>(`${URL}/models`);
     console.log(response);
     if (!response) {
         throw new Error('Failed to fetch medical models');
@@ -1086,7 +1084,7 @@ export const PostWithSecureModels = async (file: File, name: string, version: st
         formData.append("version", version);
         formData.append("classname", classname);
 
-        const response = await fetch(`${SERVER_URL}/models`, {
+        const response = await fetch(`${URL}/models`, {
             method: 'POST',
             body: formData,
 
@@ -1118,7 +1116,7 @@ type DataItem = {
 
 export const requestWithSecureData = async (): Promise<DataItem[]> => {
     try {
-        const response = await fetch(`${SERVER_URL}/data`);
+        const response = await fetch(`${URL}/data`);
         if (!response.ok) {
             new Error(`HTTP error! status: ${response.status}`);
         }
@@ -1156,7 +1154,7 @@ export const PostWithSecureData = async (file: File, classname: string) => {
 export const withSecureAttack = async (formData: any) => {
     try {
         console.log(formData);
-        return await makeApiRequest<any>(`${SERVER_URL}/attacks`, "post", formData);
+        return await makeApiRequest<any>(`${URL}/attacks`, "post", formData);
     } catch (error) {
         console.error('Error calling API:', error);
     }
@@ -1164,7 +1162,7 @@ export const withSecureAttack = async (formData: any) => {
 
 export const requestWithSecureAttackStatus = async () => {
     try {
-        return await makeApiRequest<any[]>(`${SERVER_URL}/attacks`);
+        return await makeApiRequest<any[]>(`${URL}/attacks`);
     } catch (error) {
         console.error('Error calling API:', error);
     }
@@ -1172,7 +1170,7 @@ export const requestWithSecureAttackStatus = async () => {
 
 export const requestWithSecureSingleAttackStatus = async (id: string) => {
     try {
-        return await makeApiRequest<any[]>(`${SERVER_URL}/attacks/${id}`);
+        return await makeApiRequest<any[]>(`${URL}/attacks/${id}`);
     } catch (error) {
         console.error('Error calling API:', error);
     }
