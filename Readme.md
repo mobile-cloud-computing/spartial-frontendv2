@@ -1,6 +1,6 @@
 # Running Guide for Spatial Frontend v2 Locally
 
-This guide provides a step-by-step approach to running the Spatial Frontend v2 application locally. It covers running the application directly using Node.js and npm, using Docker to run it in a container, and automating the setup using an Ansible playbook.
+This guide provides a step-by-step approach to running the Spatial Frontend v2 application locally. It covers running the application directly using Node.js and npm, using Docker to run it in a container, and setting up automated deployment using GitHub Actions.
 
 ## Prerequisites
 
@@ -10,7 +10,7 @@ Before you begin, ensure you have the following installed on your local machine:
 - **npm** (v8.x or later)
 - **Git**
 - **Docker** (for containerized deployment)
-- **Ansible** (for automated configuration)
+- **GitHub Repository with Secrets** (for automated deployment)
 
 ## Running Options
 
@@ -45,12 +45,10 @@ Before you begin, ensure you have the following installed on your local machine:
    REACT_APP_OKTA_SCOPES=openid profile email
    REACT_APP_OKTA_PKCE=true
    REACT_APP_OKTA_DISABLE_HTTPS_CHECK=true
-   REACT_APP_OKTA_REDIRECT_URI=http://localhost:3000/login/callback
+   REACT_APP_OKTA_REDIRECT_URI=http://vm_ip/login/callback
    REACT_APP_API_GATEWAY_HOST=api_gateway_host
-   REACT_APP_API_GATEWAY_PORT=8000
+   REACT_APP_API_GATEWAY_PORT=api_gateway_port
    ```
-
-   Ensure these variables are correctly set to match your local environment.
 
 4. **Start the Application**
 
@@ -120,7 +118,6 @@ Before you begin, ensure you have the following installed on your local machine:
 
    The application will be accessible at `http://localhost:3000`.
 
-4. **Customizing Environment Variables (Optional)**
 6. **Customizing Environment Variables (Optional)**
 
    Adjust the environment variables in the Dockerfile or pass them at runtime using the `--env-file` option:
@@ -129,127 +126,85 @@ Before you begin, ensure you have the following installed on your local machine:
    docker run -p 3000:3000 --env-file .env spatial-frontendv2
    ```
 
-   tasks:
-   - name: Update and upgrade apt packages
-   apt:
-   update_cache: yes
-   upgrade: yes
+### Option 4: Automated Deployment to VM Using GitHub Actions
 
-       - name: Install required packages
-         apt:
-           name:
-             - git
-             - curl
-             - docker.io
-           state: present
+You can set up automated deployment to your VM using GitHub Actions, allowing you to push changes to the `master` branch and automatically deploy them to your VM.
 
-       - name: Install Node.js and npm
-         shell: |
-           curl -sL https://deb.nodesource.com/setup_16.x | bash -
-           apt-get install -y nodejs
-         args:
-           creates: /usr/bin/node
+#### Steps to Set Up Automated Deployment
 
-       - name: Verify Node.js and npm installation
-         command: "{{ item }}"
-         with_items:
-           - node --version
-           - npm --version
+1. **Create GitHub Secrets**
 
-       - name: Clone the Spatial Frontend v2 repository
-         git:
-           repo: "{{ repo_url }}"
-           dest: "{{ app_directory }}"
-           update: yes
+   Go to your GitHub repository's settings and add the following secrets:
 
-       - name: Install npm dependencies
-         command: npm install
-         args:
-           chdir: "{{ app_directory }}"
+   - `VM_SSH_KEY`: The private SSH key for accessing the VM.
+   - `VM_IP`: The IP address of your VM.
+   - `SSH_USERNAME`: The username for SSH access on the VM.
 
-       - name: Create environment file from template
-         template:
-           src: .env.j2
-           dest: "{{ app_directory }}/.env"
+2. **Create the Deployment Workflow File**
 
-       - name: Build and run the Docker container
-         shell: |
-           docker build -t spatial-frontendv2 .
-           docker run -d -p 3000:3000 spatial-frontendv2
-         args:
-           chdir: "{{ app_directory }}"
-
-       - name: Ensure Docker container is running
-         shell: docker ps | grep spatial-frontendv2
-         register: container_status
-         retries: 3
-         delay: 5
-         until: container_status.rc == 0
-
-       - name: Output application URL
-         debug:
-           msg: "Spatial Frontend v2 is running at http://{{ ansible_host }}:3000"
-   ```
-
-2. **Create the Environment Variables Template**
-
-   Create a file named `.env.j2` in the same directory as the playbook with the following content:
-
-   ```env
-   REACT_APP_OKTA_CLIENT_ID={{ okta_client_id }}
-   REACT_APP_OKTA_ISSUER={{ okta_issuer }}
-   REACT_APP_OKTA_SCOPES={{ okta_scopes }}
-   REACT_APP_OKTA_PKCE={{ okta_pkce }}
-   REACT_APP_OKTA_DISABLE_HTTPS_CHECK={{ okta_disable_https_check }}
-   REACT_APP_OKTA_REDIRECT_URI={{ okta_redirect_uri }}
-   REACT_APP_API_GATEWAY_HOST={{ api_gateway_host }}
-   REACT_APP_API_GATEWAY_PORT={{ api_gateway_port }}
-   ```
-
-3. **Create a Variables File**
-
-   Create a file named `spatial_vars.yml` with your environment variables:
+   Create a new file in your repository at `.github/workflows/deploy.yml` with the following content:
 
    ```yaml
-   target_host: "vm_ip_or_hostname"
-   okta_client_id: "okta_client_id"
-   okta_issuer: "okta_issuer"
-   okta_scopes: "openid profile email"
-   okta_pkce: "true"
-   okta_disable_https_check: "true"
-   okta_redirect_uri: "http://vm_ip_or_hostname:3000/login/callback"
-   api_gateway_host: "api_gateway_host"
-   api_gateway_port: "8000"
+   name: Auto Deploy to VM
+
+   on:
+     push:
+       branches:
+         - master
+
+   jobs:
+     deploy:
+       runs-on: ubuntu-latest
+
+       steps:
+         # Step 1: Check out the repository
+         - name: Checkout Repository
+           uses: actions/checkout@v2
+
+         # Step 2: Set up SSH agent with private key
+         - name: Set up SSH
+           uses: webfactory/ssh-agent@v0.5.3
+           with:
+             ssh-private-key: ${{ secrets.VM_SSH_KEY }}
+
+         # Step 3: Deploy to VM
+         - name: Deploy to VM
+           env:
+             VM_IP: ${{ secrets.VM_IP }}
+             SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+           run: |
+             ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$VM_IP "
+               cd ~/spatial-frontendv2 || exit 1
+               git pull origin master
+               if ! command -v docker-compose &> /dev/null; then
+                 sudo curl -L 'https://github.com/docker/compose/releases/download/v2.1.1/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose
+                 sudo chmod +x /usr/local/bin/docker-compose
+               fi
+               if ! command -v npm &> /dev/null; then
+                 curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+                 sudo apt-get install -y nodejs
+               fi
+               if ! command -v pm2 &> /dev/null; then
+                 sudo npm install -g pm2
+               fi
+               sudo docker-compose down
+               sudo docker-compose up -d --build
+               sudo npm install
+               pm2 describe spatial-app || pm2 start npm --name spatial-app -- run start
+               pm2 restart spatial-app --update-env
+             "
    ```
 
-4. **Run the Ansible Playbook**
+## Setting Up Environment Variables
 
-   Execute the playbook using the following command:
+The application uses environment variables for configuration. Ensure that you correctly set these variables either in the `.env` file (for local and Docker setups).
 
-   ```bash
-   ansible-playbook -i hosts configure_spatial_frontend.yml -e "@spatial_vars.yml"
-   ```
+## Troubleshooting
 
-   Replace `hosts` with your Ansible inventory file that includes the target VM.
+If you encounter issues while running the application locally, using Docker, or GitHub Actions, consider the following:
 
-5. **Access the Application**
-
-   The application should now be running on your VM at `http://vm_ip_or_hostname:3000`.
-
-#### Notes
-
-- **Dynamic Variables**: The playbook is designed to use dynamic variables. You can modify the `spatial_vars.yml` file or pass variables directly via the command line.
-- **No Static Vars**: The playbook does not contain static variable definitions, allowing for flexible configuration.
-
-### Setting Up Environment Variables
-
-The application uses environment variables for configuration. Ensure that you correctly set these variables either in the `.env` file (for local and Docker setups) or via the Ansible variables file.
-
-### Troubleshooting
-
-If you encounter issues while running the application locally, using Docker, or with the Ansible playbook, consider the following:
-
-- **Dependencies**: Verify that all dependencies are installed without errors by checking the output of `npm install` or the Ansible playbook run.
+- **Dependencies**: Verify that all dependencies are installed without errors by checking the output of `npm install`.
 - **Docker**: If using Docker, check the container logs for errors using `docker logs <container_id>`.
-- **Ansible**: Check the playbook output for any error messages and ensure that SSH access to the target VM is configured correctly.
-- **Environment Variables**: Ensure all required variables are correctly set and formatted in your `.env` file or variables file.
+- **GitHub Actions**: Check the Actions logs in your GitHub repository to debug the deployment process.
+- **Environment Variables**: Ensure all required variables are correctly set in your `.env` file or the variables file.
+
