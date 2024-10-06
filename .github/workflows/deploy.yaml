@@ -34,10 +34,7 @@ jobs:
             git pull origin master
 
             # If using Docker, rebuild and restart the container
-            sudo docker-compose down
-            sudo docker-compose up -d --build
-
-            # Or, if not using Docker, build and restart the application
-            sudo npm install
-            pm2 restart app_name
+            sudo docker compose down
+            sudo docker compose up -d --build
+          
           "
