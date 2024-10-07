@@ -5,7 +5,7 @@ export const SERVER_PORT = process.env.REACT_APP_API_GATEWAY_PORT
 
 export const SERVER_URL = `http://${SERVER_HOST}:${SERVER_PORT}`;
 
-export const URL = SERVER_URL;
+export const URL = '';
 
 
 // BuildACPage.tsx
