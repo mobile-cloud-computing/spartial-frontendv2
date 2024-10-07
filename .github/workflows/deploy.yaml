@@ -25,12 +25,12 @@ jobs:
           VM_IP: ${{ secrets.VM_IP }}
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
         run: |
-          ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$VM_IP << 'EOF'
+          ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$VM_IP << EOF
             # Navigate to the app directory on the VM
             cd ~/spartial-frontendv2 || exit 1
 
             # Mark the directory as safe for Git
-            git config --global --add safe.directory /home/***/spartial-frontendv2
+            git config --global --add safe.directory ~/spartial-frontendv2
 
             # Pull the latest changes
             git pull origin main
@@ -49,11 +49,14 @@ jobs:
               sudo systemctl enable docker
             fi
 
-            # Install dependencies
-            sudo npm install
+            # Install dependencies (without sudo)
+            npm install
 
             # Fix any npm vulnerabilities
-            sudo npm audit fix || sudo npm audit fix --force
+            npm audit fix || npm audit fix --force
+
+            # Build Docker image
+            docker build -t spatial-frontendv2 .
 
             # Stop and remove the existing Docker container if it exists
             if [ "$(docker ps -a -q -f name=spartial-app)" ]; then
@@ -62,12 +65,5 @@ jobs:
             fi
 
             # Run the Docker container
-            sudo docker run -d \
-              --name spartial-app \
-              -p 3000:3000 \
-              -e DANGEROUSLY_DISABLE_HOST_CHECK=true \
-              -v ~/spartial-frontendv2:/app \
-              -w /app \
-              node:18 \
-              sh -c "npm install && npm run start"
+            docker run --name spartial-app -p 3000:3000 -e DANGEROUSLY_DISABLE_HOST_CHECK=true spatial-frontendv2
           EOF
