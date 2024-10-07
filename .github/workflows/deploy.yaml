@@ -54,19 +54,29 @@ jobs:
               sudo kill -9 $(lsof -t -i:3000) || true
             fi
 
-            # Stop and remove any running container on port 3000
+            # Wait for port to be freed
+            sleep 5
+
+            # Double-check if port 3000 is still in use
+            if lsof -i:3000; then
+              echo "Port 3000 is still in use. Exiting deployment."
+              exit 1
+            fi
+
+            # Remove any existing container using port 3000
             if [ "$(docker ps -q -f publish=3000)" ]; then
               sudo docker stop $(docker ps -q -f publish=3000) || true
               sudo docker rm $(docker ps -q -f publish=3000) || true
             fi
 
-            # Remove any stopped containers using port 3000
-            if [ "$(docker ps -a -q -f publish=3000)" ]; then
-              sudo docker rm $(docker ps -a -q -f publish=3000) || true
+            # Remove any stopped containers
+            if [ "$(docker ps -a -q)" ]; then
+              sudo docker rm $(docker ps -a -q) || true
             fi
 
-            # Clean up unused Docker resources to free up space
+            # Clean up unused Docker resources, including networks
             sudo docker system prune -f --volumes
+            sudo docker network prune -f
 
             # Install dependencies
             npm install
