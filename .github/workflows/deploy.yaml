@@ -10,30 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      # Step 2: Set up SSH agent with private key
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
+      # Deploy to VM via SSH
+      - name: Deploy to VM via SSH
+        uses: appleboy/ssh-action@v0.1.4
         with:
-          ssh-private-key: ${{ secrets.VM_SSH_KEY }}
-
-      - name: Deploy to VM
-        env:
-          VM_IP: ${{ secrets.VM_IP }}
-          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-        run: |
-          ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$VM_IP << EOF
-            # Navigate to the app directory on the VM
-            cd ~/spartial-frontendv2 || exit 1
-
-            # Mark the directory as safe for Git
-            git config --global --add safe.directory ~/spartial-frontendv2
-
-            # Pull the latest changes
-            git pull origin main
+          host: ${{ secrets.VM_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            # Navigate to the app directory or clone if it doesn't exist
+            if [ -d "~/spatial-frontendv2" ]; then
+              cd ~/spatial-frontendv2
+              git pull origin main
+            else
+              git clone https://github.com/mobile-cloud-computing/spartial-frontendv2.git ~/spatial-frontendv2
+              cd ~/spatial-frontendv2
+            fi
 
             # Ensure Node.js (version 18) and npm are installed
             if ! command -v npm &> /dev/null; then
@@ -49,44 +41,14 @@ jobs:
               sudo systemctl enable docker
             fi
 
-            # Remove any existing container using port 3000
-            if [ "$(docker ps -q -f publish=3000)" ]; then
-              sudo docker stop $(docker ps -q -f publish=3000) || true
-              sudo docker rm $(docker ps -q -f publish=3000) || true
+            # Stop and remove any existing Docker container named 'spatial-app'
+            if [ "$(docker ps -q -f name=spatial-app)" ]; then
+              docker stop spatial-app
+              docker rm spatial-app
             fi
-
-            # Remove any stopped containers
-            if [ "$(docker ps -a -q)" ]; then
-              sudo docker rm $(docker ps -a -q) || true
-            fi
-
-            # Clean up unused Docker resources, including networks
-            sudo docker system prune -f --volumes
-            sudo docker network prune -f
-          
-            # Kill any process running on port 3000
-            if lsof -i:3000; then
-              sudo kill -9 $(lsof -t -i:3000) || true
-            fi
-
-            # Wait for port to be freed
-            sleep 5
-
-            # Double-check if port 3000 is still in use
-            if lsof -i:3000; then
-              echo "Port 3000 is still in use. Exiting deployment."
-              exit 1
-            fi
-
-            # Install dependencies
-            npm install
-
-            # Fix any npm vulnerabilities
-            npm audit fix || npm audit fix --force
 
             # Build Docker image
             docker build -t spatial-frontendv2 .
 
             # Run the Docker container
-            docker run --name spartial-app -p 3000:3000 -e DANGEROUSLY_DISABLE_HOST_CHECK=true spatial-frontendv2
-          EOF
+            docker run -d --name spatial-app -p 3000:3000 -e DANGEROUSLY_DISABLE_HOST_CHECK=true spatial-frontendv2
