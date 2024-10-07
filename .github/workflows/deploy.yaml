@@ -49,24 +49,24 @@ jobs:
               sudo systemctl enable docker
             fi
 
-            # Stop and remove any running container on port 3000
-            if [ "$(docker ps -q -f publish=3000)" ]; then
-              sudo docker stop $(docker ps -q -f publish=3000)
-              sudo docker rm $(docker ps -q -f publish=3000)
-            fi
-
             # Kill any process running on port 3000
             if lsof -i:3000; then
-              sudo kill -9 $(lsof -t -i:3000)
+              sudo kill -9 $(lsof -t -i:3000) || true
+            fi
+
+            # Stop and remove any running container on port 3000
+            if [ "$(docker ps -q -f publish=3000)" ]; then
+              sudo docker stop $(docker ps -q -f publish=3000) || true
+              sudo docker rm $(docker ps -q -f publish=3000) || true
             fi
 
             # Remove any stopped containers using port 3000
             if [ "$(docker ps -a -q -f publish=3000)" ]; then
-              sudo docker rm $(docker ps -a -q -f publish=3000)
+              sudo docker rm $(docker ps -a -q -f publish=3000) || true
             fi
 
             # Clean up unused Docker resources to free up space
-            sudo docker system prune -f
+            sudo docker system prune -f --volumes
 
             # Install dependencies
             npm install
