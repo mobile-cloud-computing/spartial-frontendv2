@@ -49,7 +49,26 @@ jobs:
               sudo systemctl enable docker
             fi
 
-            # Install dependencies (without sudo)
+            # Stop and remove any running container on port 3000
+            if [ "$(docker ps -q -f publish=3000)" ]; then
+              sudo docker stop $(docker ps -q -f publish=3000)
+              sudo docker rm $(docker ps -q -f publish=3000)
+            fi
+
+            # Kill any process running on port 3000
+            if lsof -i:3000; then
+              sudo kill -9 $(lsof -t -i:3000)
+            fi
+
+            # Remove any stopped containers using port 3000
+            if [ "$(docker ps -a -q -f publish=3000)" ]; then
+              sudo docker rm $(docker ps -a -q -f publish=3000)
+            fi
+
+            # Clean up unused Docker resources to free up space
+            sudo docker system prune -f
+
+            # Install dependencies
             npm install
 
             # Fix any npm vulnerabilities
@@ -57,12 +76,6 @@ jobs:
 
             # Build Docker image
             docker build -t spatial-frontendv2 .
-
-            # Stop and remove the existing Docker container if it exists
-            if [ "$(docker ps -a -q -f name=spartial-app)" ]; then
-              sudo docker stop spartial-app || true
-              sudo docker rm spartial-app || true
-            fi
 
             # Run the Docker container
             docker run --name spartial-app -p 3000:3000 -e DANGEROUSLY_DISABLE_HOST_CHECK=true spatial-frontendv2
