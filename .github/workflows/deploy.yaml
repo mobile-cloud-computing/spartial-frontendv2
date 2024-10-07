@@ -20,7 +20,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.VM_SSH_KEY }}
 
-      # Step 3: Deploy to VM
       - name: Deploy to VM
         env:
           VM_IP: ${{ secrets.VM_IP }}
@@ -29,38 +28,46 @@ jobs:
           ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$VM_IP << 'EOF'
             # Navigate to the app directory on the VM
             cd ~/spartial-frontendv2 || exit 1
-
+          
+            # Mark the directory as safe for Git
+            git config --global --add safe.directory /home/***/spartial-frontendv2
+          
             # Pull the latest changes
             git pull origin main
-
-            # Ensure Docker Compose is installed
-            if ! command -v docker-compose &> /dev/null; then
-              sudo curl -L "https://github.com/docker/compose/releases/download/v2.1.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
-            fi
-
-            # Ensure Node.js and npm are installed
+          
+            # Ensure Node.js (version 18) and npm are installed
             if ! command -v npm &> /dev/null; then
-              curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
               sudo apt-get install -y nodejs
             fi
-
-            # Ensure PM2 is installed
-            if ! command -v pm2 &> /dev/null; then
-              sudo npm install -g pm2
+          
+            # Ensure Docker is installed
+            if ! command -v docker &> /dev/null; then
+              sudo apt-get update
+              sudo apt-get install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
             fi
-
+          
             # Install dependencies
             sudo npm install
-
-            # If using Docker, rebuild and restart the container
-            sudo docker-compose down
-            sudo docker-compose up -d --build
-
-            # If not using Docker, start the application with PM2
-            if pm2 describe spartial-app > /dev/null; then
-              pm2 restart spartial-app --update-env
-            else
-              pm2 start npm --name spartial-app -- run start
+          
+            # Fix any npm vulnerabilities
+            sudo npm audit fix || sudo npm audit fix --force
+          
+            # Stop the existing Docker container (if running)
+            if [ "$(docker ps -q -f name=spartial-app)" ]; then
+              sudo docker stop spartial-app
+              sudo docker rm spartial-app
             fi
+          
+            # Run the Docker container
+            sudo docker run -d \
+              --name spartial-app \
+              -p 3000:3000 \
+              -e DANGEROUSLY_DISABLE_HOST_CHECK=true \
+              -v ~/spartial-frontendv2:/app \
+              -w /app \
+              node:18 \
+              sh -c "npm install && npm run start"
           EOF
