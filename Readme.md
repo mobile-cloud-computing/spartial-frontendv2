@@ -1,4 +1,4 @@
-# Running Guide for Spatial Frontend v2
+# Installation guide and usage instructions for the SPATIAL Dashboard (Front-end)
 
 This guide provides a step-by-step approach to running the Spatial Frontend v2 application. It covers running the application locally using Node.js and npm, using Docker for containerized deployment, automating the deployment on a target VM using Ansible, and setting up a continuous deployment workflow with GitHub Actions.
 
@@ -171,63 +171,104 @@ Use Ansible to automate the setup, configuration, and deployment of the Spatial 
 
    ```yaml
    ---
-   - hosts: "{{ target_host }}"
-     become: yes
-     vars:
-       node_version: "18.x"
-     tasks:
-       - name: Update and upgrade apt packages
-         apt:
-           update_cache: yes
-           upgrade: dist
+- name: Configure Spatial Frontend v2
+  hosts: "{{ target_host }}"
+  become: yes
+  tasks:
+   - name: Update and upgrade apt packages
+     apt:
+     update_cache: yes
+     upgrade: yes
 
-       - name: Install required packages
-         apt:
-           name:
-             - git
-             - curl
-             - build-essential
-           state: present
+   - name: Install required packages
+     apt:
+     name:
+     - git
+     - curl
+     state: present
+     update_cache: yes
 
-       - name: Install Node.js
-         shell: |
-           curl -fsSL https://deb.nodesource.com/setup_{{ node_version }} | bash -
-           apt-get install -y nodejs
-         args:
-           executable: /bin/bash
+   - name: Install Docker using official script
+     shell: |
+     curl -fsSL https://get.docker.com -o get-docker.sh
+     sh get-docker.sh
+     args:
+     creates: /usr/bin/docker
 
-       - name: Clone the repository
-         git:
-           repo: "{{ repo_url }}"
-           dest: "{{ app_directory }}"
-           version: main
-           force: yes
+   - name: Install Node.js and npm
+     shell: |
+     curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+     apt-get install -y nodejs
+     args:
+     creates: /usr/bin/node
 
-       - name: Copy .env file
-         copy:
-           src: .env
-           dest: "{{ app_directory }}/.env"
+   - name: Verify Node.js and npm installation
+     command: "{{ item }}"
+     with_items:
+      - node --version
+      - npm --version
 
-       - name: Install npm dependencies
-         npm:
-           path: "{{ app_directory }}"
-           production: false
+   - name: Create the application directory on the remote VM
+     file:
+     path: "/home/ubuntu/spatial-frontendv2"
+     state: directory
+     mode: '0755'
 
-       - name: Install PM2 globally
-         npm:
-           name: pm2
-           global: yes
+   - name: Clone the repository into the application directory
+     git:
+     repo: "{{ repo_url }}"
+     dest: "/home/ubuntu/spatial-frontendv2"
+     update: yes
 
-       - name: Start the application with PM2
-         shell: |
-           pm2 delete spatial-app || true
-           pm2 start npm --name spatial-app -- start
-           pm2 save
-         args:
-           chdir: "{{ app_directory }}"
+   - name: Clone the Spatial Frontend v2 repository
+     git:
+     repo: "{{ repo_url }}"
+     dest: "{{ app_directory }}"
+     update: yes
 
-       - name: Configure PM2 to start on boot
-         shell: pm2 startup systemd -u {{ ansible_user }} --hp {{ app_directory }}
+   - name: Copy .env file to the target VM
+     copy:
+     src: "../.env"
+     dest: "{{ app_directory }}/.env"
+
+   - name: Install npm dependencies
+     command: npm install
+     args:
+     chdir: "{{ app_directory }}"
+
+   - name: Stop any running Docker container on port 3000
+     shell: docker ps --filter "publish=3000" --format "{{'{{.ID}}'}}" | xargs -r docker stop
+     ignore_errors: true
+
+   - name: Remove any stopped Docker containers on port 3000
+     shell: docker ps -a --filter "status=exited" --filter "publish=3000" --format "{{'{{.ID}}'}}" | xargs -r docker rm
+     ignore_errors: true
+
+   - name: Kill any process using port 3000
+     shell: lsof -t -i:3000 | xargs -r kill -9
+     ignore_errors: true
+
+   - name: Remove unused Docker resources to free up space
+     shell: docker system prune -f
+     ignore_errors: true
+
+   - name: Build and run the Docker container
+     shell: |
+     docker build -t spatial-frontendv2 .
+     docker run -d -p 3000:3000 --env-file .env -e DANGEROUSLY_DISABLE_HOST_CHECK=true spatial-frontendv2
+     args:
+     chdir: "{{ app_directory }}"
+
+   - name: Ensure Docker container is running
+     shell: docker ps | grep spatial-frontendv2
+     register: container_status
+     retries: 3
+     delay: 5
+     until: container_status.rc == 0
+
+   - name: Output application URL
+     debug:
+     msg: "Spatial Frontend v2 is running at http://{{ ansible_host }}:3000"
    ```
 
 5. **Run the Ansible Playbook**
@@ -262,52 +303,77 @@ Automate the deployment process using GitHub Actions to deploy your application 
    Create a new file in your repository at `.github/workflows/deploy.yml` with the following content:
 
    ```yaml
-   name: Auto Deploy to VM
-   on:
-     push:
-       branches:
+         name: Auto Deploy to VM
+         
+         on:
+         push:
+         branches:
          - main
-
-   jobs:
-     deploy:
-       runs-on: ubuntu-latest
-       steps:
-         # Step 1: Check out the repository
-         - name: Checkout Repository
-           uses: actions/checkout@v3
-
-         # Step 2: Set up SSH agent with private key
-         - name: Set up SSH
-           uses: webfactory/ssh-agent@v0.5.4
+         
+         jobs:
+         deploy:
+         runs-on: ubuntu-latest
+         
+        steps:
+         - name: Deploy to VM via SSH
+           uses: appleboy/ssh-action@v0.1.8
            with:
-             ssh-private-key: ${{ secrets.VM_SSH_KEY }}
-
-         # Step 3: Deploy to VM
-         - name: Deploy to VM
-           env:
-             VM_IP: ${{ secrets.VM_IP }}
-             SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-           run: |
-             ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$VM_IP '
-               cd ~/spatial-frontendv2 || git clone https://github.com/mobile-cloud-computing/spatial-frontendv2.git ~/spatial-frontendv2
-               cd ~/spatial-frontendv2
-               git pull origin main
+             host: ${{ secrets.VM_IP }}
+             username: ${{ secrets.SSH_USERNAME }}
+             key: "${{ secrets.VM_SSH_KEY }}"
+             # If using base64 encoding:
+             # key: "${{ secrets.VM_SSH_KEY_BASE64 }}"
+             # key_is_b64: true
+             script: |
+               # Navigate to the app directory or clone if it doesn't exist
+               if [ -d ~/spatial-frontendv2 ]; then
+                 cd ~/spatial-frontendv2
+                 git pull origin main
+               else
+                 git clone https://github.com/mobile-cloud-computing/spartial-frontendv2.git ~/spatial-frontendv2
+                 cd ~/spatial-frontendv2
+               fi
+   
+               # Ensure Node.js (version 18) and npm are installed
                if ! command -v npm &> /dev/null; then
                  curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
                  sudo apt-get install -y nodejs
                fi
-               if ! command -v pm2 &> /dev/null; then
-                 sudo npm install -g pm2
+   
+               # Ensure Docker is installed
+               if ! command -v docker &> /dev/null; then
+                 sudo apt-get update
+                 sudo apt-get install -y docker.io
+                 sudo systemctl start docker
+                 sudo systemctl enable docker
                fi
-               npm install
-               pm2 delete spatial-app || true
-               pm2 start npm --name spatial-app -- start
-               pm2 save
-             '
+   
+               # Kill any process running on port 3000
+               if lsof -i:3000; then
+                 sudo kill -9 $(lsof -t -i:3000) || true
+               fi
+   
+               # Stop and remove any existing Docker container named 'spatial-app'
+               if [ "$(docker ps -q -f name=spatial-app)" ]; then
+                 docker stop spatial-app
+                 docker rm spatial-app
+               fi
+   
+               # Remove any Docker containers using port 3000
+               if [ "$(docker ps -q -f publish=3000)" ]; then
+                 docker stop $(docker ps -q -f publish=3000)
+                 docker rm $(docker ps -q -f publish=3000)
+               fi
+   
+               # Build Docker image
+               docker build -t spatial-frontendv2 .
+   
+               # Run the Docker container
+               docker run -d --name spatial-app -p 3000:3000 -e DANGEROUSLY_DISABLE_HOST_CHECK=true spatial-frontendv2
    ```
 
    - **Notes**:
-      - Ensure you have set up the necessary secrets (`VM_SSH_KEY`, `VM_IP`, `SSH_USERNAME`) in your GitHub repository settings.
+      - Ensure you have set up the necessary secrets (`VM_SSH_KEY`, `VM_IP`, `SSH_USERNAME`) in the GitHub repository settings.
       - This workflow checks if Node.js and PM2 are installed and installs them if they are not.
       - The application is started using PM2 for process management.
 
@@ -339,3 +405,22 @@ If you encounter issues while running the application:
    - Check the workflow logs for any errors during deployment.
 - **Environment Variables**: Confirm that the `.env` file is correctly populated and accessible.
 - **Ports**: Make sure that the ports you're using are open and not blocked by firewalls.
+
+
+## How to Cite
+-----------
+This tool is open-source and contains the front-end of the SPATIAL Platform. The research is part of the SPATIAL project, funded by the European Union's Horizon 2020 research and innovation program under grant agreement No. 101021808.
+
+- Ottun, Abdul-Rasheed, et al. ["The SPATIAL architecture: Design and development experiences from gauging and monitoring the AI inference capabilities of modern applications."](https://ieeexplore.ieee.org/abstract/document/10630929) *IEEE 44th International Conference on Distributed Computing Systems (ICDCS)*, 2024.
+
+**BibTeX**
+```bibtex
+@inproceedings{ottun2024spatial,
+  title={The SPATIAL architecture: Design and development experiences from gauging and monitoring the AI inference capabilities of modern applications},
+  author={Ottun, Abdul-Rasheed and Marasinghe, Rasinthe and Elemosho, Toluwani and Liyanage, Mohan and Ragab, Mohamad and Bagave, Prachi and Westberg, Marcus and others},
+  booktitle={2024 IEEE 44th International Conference on Distributed Computing Systems (ICDCS)},
+  pages={947--959},
+  year={2024},
+  organization={IEEE}
+}
+```

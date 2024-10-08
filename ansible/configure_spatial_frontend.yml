@@ -38,14 +38,14 @@
 
     - name: Create the application directory on the remote VM
       file:
-        path: "/home/ubuntu/spartial-frontendv2"
+        path: "/home/ubuntu/spatial-frontendv2"
         state: directory
         mode: '0755'
 
     - name: Clone the repository into the application directory
       git:
         repo: "{{ repo_url }}"
-        dest: "/home/ubuntu/spartial-frontendv2"
+        dest: "/home/ubuntu/spatial-frontendv2"
         update: yes
 
     - name: Clone the Spatial Frontend v2 repository
