@@ -160,118 +160,114 @@ Use Ansible to automate the setup, configuration, and deployment of the Spatial 
    repo_url: "https://github.com/mobile-cloud-computing/spatial-frontendv2.git"
    app_directory: "~/spatial-frontendv2"
    ```
-   
-3. **Set Up Environment Variables**
 
-   Place the `.env` file in the same directory as your Ansible playbook. It should contain the necessary environment variables.
-
-4. **Create the Ansible Playbook**
+3. **Create the Ansible Playbook**
 
    Create an Ansible playbook named `configure_spatial_frontend.yml` with the following content:
 
    ```yaml
-   ---
-- name: Configure Spatial Frontend v2
-  hosts: "{{ target_host }}"
-  become: yes
-  tasks:
-   - name: Update and upgrade apt packages
-     apt:
-     update_cache: yes
-     upgrade: yes
+         ---
+         - name: Configure Spatial Frontend v2
+           hosts: "{{ target_host }}"
+           become: yes
+           tasks:
+            - name: Update and upgrade apt packages
+              apt:
+              update_cache: yes
+              upgrade: yes
+      
+            - name: Install required packages
+              apt:
+              name:
+              - git
+              - curl
+              state: present
+              update_cache: yes
+      
+            - name: Install Docker using official script
+              shell: |
+              curl -fsSL https://get.docker.com -o get-docker.sh
+              sh get-docker.sh
+              args:
+              creates: /usr/bin/docker
+      
+            - name: Install Node.js and npm
+              shell: |
+              curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+              apt-get install -y nodejs
+              args:
+              creates: /usr/bin/node
+      
+            - name: Verify Node.js and npm installation
+              command: "{{ item }}"
+              with_items:
+               - node --version
+               - npm --version
+      
+            - name: Create the application directory on the remote VM
+              file:
+              path: "/home/ubuntu/spatial-frontendv2"
+              state: directory
+              mode: '0755'
+      
+            - name: Clone the repository into the application directory
+              git:
+              repo: "{{ repo_url }}"
+              dest: "/home/ubuntu/spatial-frontendv2"
+              update: yes
+      
+            - name: Clone the Spatial Frontend v2 repository
+              git:
+              repo: "{{ repo_url }}"
+              dest: "{{ app_directory }}"
+              update: yes
+      
+            - name: Copy .env file to the target VM
+              copy:
+              src: "../.env"
+              dest: "{{ app_directory }}/.env"
+      
+            - name: Install npm dependencies
+              command: npm install
+              args:
+              chdir: "{{ app_directory }}"
+      
+            - name: Stop any running Docker container on port 3000
+              shell: docker ps --filter "publish=3000" --format "{{'{{.ID}}'}}" | xargs -r docker stop
+              ignore_errors: true
+      
+            - name: Remove any stopped Docker containers on port 3000
+              shell: docker ps -a --filter "status=exited" --filter "publish=3000" --format "{{'{{.ID}}'}}" | xargs -r docker rm
+              ignore_errors: true
+      
+            - name: Kill any process using port 3000
+              shell: lsof -t -i:3000 | xargs -r kill -9
+              ignore_errors: true
+      
+            - name: Remove unused Docker resources to free up space
+              shell: docker system prune -f
+              ignore_errors: true
+      
+            - name: Build and run the Docker container
+              shell: |
+              docker build -t spatial-frontendv2 .
+              docker run -d -p 3000:3000 --env-file .env -e DANGEROUSLY_DISABLE_HOST_CHECK=true spatial-frontendv2
+              args:
+              chdir: "{{ app_directory }}"
+      
+            - name: Ensure Docker container is running
+              shell: docker ps | grep spatial-frontendv2
+              register: container_status
+              retries: 3
+              delay: 5
+              until: container_status.rc == 0
+      
+            - name: Output application URL
+              debug:
+              msg: "Spatial Frontend v2 is running at http://{{ ansible_host }}:3000"
+            ```
 
-   - name: Install required packages
-     apt:
-     name:
-     - git
-     - curl
-     state: present
-     update_cache: yes
-
-   - name: Install Docker using official script
-     shell: |
-     curl -fsSL https://get.docker.com -o get-docker.sh
-     sh get-docker.sh
-     args:
-     creates: /usr/bin/docker
-
-   - name: Install Node.js and npm
-     shell: |
-     curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-     apt-get install -y nodejs
-     args:
-     creates: /usr/bin/node
-
-   - name: Verify Node.js and npm installation
-     command: "{{ item }}"
-     with_items:
-      - node --version
-      - npm --version
-
-   - name: Create the application directory on the remote VM
-     file:
-     path: "/home/ubuntu/spatial-frontendv2"
-     state: directory
-     mode: '0755'
-
-   - name: Clone the repository into the application directory
-     git:
-     repo: "{{ repo_url }}"
-     dest: "/home/ubuntu/spatial-frontendv2"
-     update: yes
-
-   - name: Clone the Spatial Frontend v2 repository
-     git:
-     repo: "{{ repo_url }}"
-     dest: "{{ app_directory }}"
-     update: yes
-
-   - name: Copy .env file to the target VM
-     copy:
-     src: "../.env"
-     dest: "{{ app_directory }}/.env"
-
-   - name: Install npm dependencies
-     command: npm install
-     args:
-     chdir: "{{ app_directory }}"
-
-   - name: Stop any running Docker container on port 3000
-     shell: docker ps --filter "publish=3000" --format "{{'{{.ID}}'}}" | xargs -r docker stop
-     ignore_errors: true
-
-   - name: Remove any stopped Docker containers on port 3000
-     shell: docker ps -a --filter "status=exited" --filter "publish=3000" --format "{{'{{.ID}}'}}" | xargs -r docker rm
-     ignore_errors: true
-
-   - name: Kill any process using port 3000
-     shell: lsof -t -i:3000 | xargs -r kill -9
-     ignore_errors: true
-
-   - name: Remove unused Docker resources to free up space
-     shell: docker system prune -f
-     ignore_errors: true
-
-   - name: Build and run the Docker container
-     shell: |
-     docker build -t spatial-frontendv2 .
-     docker run -d -p 3000:3000 --env-file .env -e DANGEROUSLY_DISABLE_HOST_CHECK=true spatial-frontendv2
-     args:
-     chdir: "{{ app_directory }}"
-
-   - name: Ensure Docker container is running
-     shell: docker ps | grep spatial-frontendv2
-     register: container_status
-     retries: 3
-     delay: 5
-     until: container_status.rc == 0
-
-   - name: Output application URL
-     debug:
-     msg: "Spatial Frontend v2 is running at http://{{ ansible_host }}:3000"
-   ```
-
-5. **Run the Ansible Playbook**
+4. **Run the Ansible Playbook**
 
    Execute the playbook to configure and deploy the application:
 
@@ -288,7 +284,7 @@ Use Ansible to automate the setup, configuration, and deployment of the Spatial 
    - Install npm dependencies.
    - Start the application using PM2 and configure it to start on boot.
 
-6. **Access the Application**
+5. **Access the Application**
 
    The application will be accessible at `http://<target_vm_ip>:3000`.
 
