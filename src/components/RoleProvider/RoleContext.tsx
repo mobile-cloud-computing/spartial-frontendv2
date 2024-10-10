@@ -21,7 +21,7 @@ export const RoleProvider: React.FC<{ children: ReactNode }> = ({
   const [userRole, setUserRole] = useState<Role>("endUser");
 
   const rolesForServices: { [key: string]: Role[] } = {
-    XAI: ["endUser", "business", "developer", "auditor"],
+    XAI: ["endUser"],
     Medical: ["endUser", "medicalExpert", "developer"],
     Network: ["endUser"],
     Fairness: ["endUser", "developer"],

@@ -999,6 +999,53 @@ const readFileAsBlob = (file: File): Promise<Blob> => {
         reader.readAsArrayBuffer(file);
     });
 };
+
+// Modified xaiAPI to call all XAI methods
+export const xaiAPIAllMethods = async (image: File, mlModel: File, imagetype: string) => {
+    try {
+      const requestBody = new FormData();
+      requestBody.append("file", image);
+      requestBody.append("mlModel", mlModel);
+  
+      const imageFileBytes = await readFileAsBlob(image);
+      requestBody.append("ImageFileBytes", imageFileBytes, "image.bin");
+  
+      // Calls to each method
+      const limePromise = makeApiRequest<any>(
+        `${URL}/explain_lime/image?imagetype=${imagetype}`,
+        "post",
+        requestBody,
+        "json"
+      );
+  
+      const shapPromise = makeApiRequest<any>(
+        `${URL}/explain_shap/image?imagetype=${imagetype}`,
+        "post",
+        requestBody,
+        "json"
+      );
+  
+      const occPromise = makeApiRequest<any>(
+        `${URL}/explain_occlusion/image?imagetype=${imagetype}`,
+        "post",
+        requestBody,
+        "json"
+      );
+  
+      // Wait for all requests to complete
+      const [limeResult, shapResult, occResult] = await Promise.all([
+        limePromise,
+        shapPromise,
+        occPromise,
+      ]);
+  
+      return { limeResult, shapResult, occResult };
+    } catch (error) {
+      console.error("Error in xaiAPIAllMethods:", error);
+      throw error;
+    }
+  };
+  
 export const requestRunShap = async (modelId: string, numberBackgroundSamples: number, numberExplainedSamples: number, maxDisplay: number) => {
 
     const url = `${URL}/api/nts/xai/shap`;
